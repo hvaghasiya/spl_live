@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -212,39 +211,54 @@ class SplashController extends GetxController {
       Permission.manageExternalStorage, // Needed for Android 10+
       Permission.requestInstallPackages, // Required for APK installation
     ].request();
-    if (statuses[Permission.storage]!.isGranted && statuses[Permission.manageExternalStorage]!.isGranted && statuses[Permission.requestInstallPackages]!.isGranted) {
+    print("fsdkfghskfjhsfkfskfdfsdf");
+    print(statuses[Permission.storage]!.isGranted);
+    print(statuses[Permission.manageExternalStorage]!.isGranted);
+    print(statuses[Permission.requestInstallPackages]!.isGranted);
+    if (statuses[Permission.storage]!.isGranted ||
+        statuses[Permission.manageExternalStorage]!.isGranted ||
+        statuses[Permission.requestInstallPackages]!.isGranted) {
       print("Storage permission granted.");
+      return true;
     } else {
       print("Storage permission denied.");
-      // openAppSettings();
+      openAppSettings();
+      return false;
     }
   }
 
   RxString percentage = "0.0".obs;
   downloadApk(String url) async {
     // requestStoragePermission();
-    await requestStoragePermission();
+    var res = await requestStoragePermission();
+    print("skfjsfhksfjhsdkfjshdfkj");
+    print(res);
     // final dir = Directory("/storage/emulated/0/Download");
-    final dir = await getTemporaryDirectory();
-    final file = File('${dir!.path}/update.apk');
-    print("djfhsgjhfsdf");
-    print("djfhsgjhfsdf${file.path}");
-    try {
-      await Dio().download(url, file.path, onReceiveProgress: (value, value1) {
-        print(value);
-        print("fdsfjdsfdsfsfgjsdfh");
-        print(value1);
-        percentage.value = ((value / value1) * 100).toInt().toString();
-      });
+    if (res) {
+      load.value = true;
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir!.path}/update.apk');
+      print("djfhsgjhfsdf");
+      print("djfhsgjhfsdf${file.path}");
+      try {
+        await Dio().download(url, file.path, onReceiveProgress: (value, value1) {
+          print(value);
+          print("fdsfjdsfdsfsfgjsdfh");
+          print(value1);
+          percentage.value = ((value / value1) * 100).toInt().toString();
+        });
 
-      const platform = MethodChannel("com.example.spllive/install_apk");
-      final result = await platform.invokeMethod("installApk", {"apkPath": file.path});
-      print(result);
-    } on DioException catch (e) {
-      print("ffjkdsfhskjfhskjfhsdf");
-      print(e.response);
+        const platform = MethodChannel("com.example.spllive/install_apk");
+        final result = await platform.invokeMethod("installApk", {"apkPath": file.path});
+        print(result);
+      } on DioException catch (e) {
+        print("ffjkdsfhskjfhskjfhsdf");
+        print(e.response);
+      }
+      print("sdfsdfkjhsfkjhfkjsd");
+    } else {
+      print("fsdjfghfjshfgjsdfhgsdjf");
     }
-    print("sdfsdfkjhsfkjhfkjsd");
 
     // installApkUsingPackageInstaller(file.path);
     // installApk(file.path);
@@ -301,7 +315,6 @@ class SplashController extends GetxController {
       actions: [
         InkWell(
           onTap: () async {
-            load.value = true;
             // launch("https://spl.live");
             downloadApk(ApiUtils.getApk);
             // try {

@@ -1,6 +1,5 @@
 package com.example.spllive
 
-
 import android.os.Build
 import android.app.PendingIntent
 import android.content.pm.PackageInstaller
@@ -40,6 +39,9 @@ class MainActivity : FlutterActivity() {
                 PackageInstaller.SessionParams.MODE_FULL_INSTALL
             )
 
+            val packageName = context.packageName
+            Log.i("INSTALL_APK", "Installing APK for package: $packageName")
+
             val sessionId = packageInstaller.createSession(sessionParams)
             val session = packageInstaller.openSession(sessionId)
 
@@ -50,20 +52,23 @@ class MainActivity : FlutterActivity() {
                 }
             }
 
-            val intent = Intent(context, MyReceiver::class.java).apply {
-                action = "com.example.SILENT_INSTALL_RESULT"
+            // Create the intent with the package name
+            val intent = Intent("com.example.SILENT_INSTALL_RESULT").apply {
+                setPackage(context.packageName)
+                putExtra(PackageInstaller.EXTRA_PACKAGE_NAME, packageName)
             }
 
-//            val intent = Intent(context, MyReceiver::class.java)
             val pendingIntent = PendingIntent.getBroadcast(
                 context, sessionId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
 
+            Log.i("INSTALL_APK", "Committing installation session")
             session.commit(pendingIntent.intentSender)
             session.close()
         } catch (e: Exception) {
             Log.e("INSTALL_APK", "Installation failed: ${e.message}")
+            e.printStackTrace()
         }
     }
 }
