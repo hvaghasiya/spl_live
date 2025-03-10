@@ -67,11 +67,13 @@ class MPINPageController extends GetxController {
           Get.offAllNamed(AppRoutName.dashBoardPage);
         } else {
           mpinErrorController.add(ErrorAnimationType.shake);
-          AppUtils.showErrorSnackBar(bodyText: value['message'] ?? "");
+          AppUtils().accountFlowDialog(msg: value['message']);
+          // AppUtils.showErrorSnackBar(bodyText: value['message'] ?? "");
         }
       });
     } catch (e) {
-      AppUtils.showErrorSnackBar(bodyText: e.toString());
+      AppUtils().accountFlowDialog(msg: e.toString());
+      // AppUtils.showErrorSnackBar(bodyText: e.toString());
     }
   }
 
