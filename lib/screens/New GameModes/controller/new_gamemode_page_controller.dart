@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-
 import '../../../Custom Controllers/wallet_controller.dart';
 import '../../../api_services/api_service.dart';
 import '../../../api_services/api_urls.dart';
@@ -259,16 +258,19 @@ class NewGamemodePageController extends GetxController {
     List<int> inputDigits = inputNumber.toString().split('').map(int.parse).toList();
     print("fsjdgjsdfsjd");
     print(inputNumber);
-    // print(inputDigits);
+    print(inputDigits);
 
     bool containsBothInputDigits(String num) {
       String numStr = num.toString();
-      // print(numStr);
+      print(numStr);
+      print("kakakakakakka");
       // return inputDigits.every((digit) => numStr.contains(digit.toString()));
       if (inputNumber == 0) {
         return numStr.contains("00");
-      } else {
+      } else if (inputDigits[0] == inputDigits[1]) {
         return numStr.contains(inputNumber.toString());
+      } else {
+        return inputDigits.every((digit) => numStr.contains(digit.toString()));
       }
     }
 
@@ -409,8 +411,7 @@ class NewGamemodePageController extends GetxController {
   checkType(index) {
     if (selectedBidsList.elementAt(index).gameModeName!.contains("Ank")) {
       return "Ank";
-    } else if (selectedBidsList.elementAt(index).gameModeName!.contains("Jodi") ||
-        selectedBidsList.elementAt(index).gameModeName! == "Red Brackets") {
+    } else if (selectedBidsList.elementAt(index).gameModeName!.contains("Jodi") || selectedBidsList.elementAt(index).gameModeName! == "Red Brackets") {
       return "Jodi";
     } else {
       return "Pana";
@@ -471,8 +472,7 @@ class NewGamemodePageController extends GetxController {
           print(existingIndex);
           if (existingIndex != -1) {
             // If the bidNo already exists in selectedBidsList, update coins value.
-            selectedBidsList[existingIndex].coins =
-                (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
+            selectedBidsList[existingIndex].coins = (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
           } else {
             selectedBidsList.insert(
               0,
@@ -519,8 +519,7 @@ class NewGamemodePageController extends GetxController {
         var existingIndex = selectedBidsList.indexWhere((element) => element.bidNo == addedNormalBidValue);
         if (existingIndex != -1) {
           // If the bidNo already exists in selectedBidsList, update coins value.
-          selectedBidsList[existingIndex].coins =
-              (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
+          selectedBidsList[existingIndex].coins = (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
         } else {
           selectedBidsList.add(
             Bids(
@@ -716,8 +715,7 @@ class NewGamemodePageController extends GetxController {
               print("Fdsfkljsdlfkjfkld");
               print(existingIndex);
               if (existingIndex != -1) {
-                selectedBidsList[existingIndex].coins =
-                    (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
+                selectedBidsList[existingIndex].coins = (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
                 digitList.clear();
                 coinController.clear();
               } else {
@@ -780,8 +778,7 @@ class NewGamemodePageController extends GetxController {
             var existingIndex = selectedBidsList.indexWhere((element) => element.bidNo == addedNormalBidValue);
             if (existingIndex != -1) {
               // If the bidNo already exists in selectedBidsList, update coins value.
-              selectedBidsList[existingIndex].coins =
-                  (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
+              selectedBidsList[existingIndex].coins = (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
             } else {
               selectedBidsList.insert(
                 0,
@@ -840,8 +837,7 @@ class NewGamemodePageController extends GetxController {
                 var existingIndex = selectedBidsList.indexWhere((element) => element.bidNo == addedNormalBidValue);
                 if (existingIndex != -1) {
                   // If the bidNo already exists in selectedBidsList, update coins value.
-                  selectedBidsList[existingIndex].coins =
-                      (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
+                  selectedBidsList[existingIndex].coins = (selectedBidsList[existingIndex].coins! + int.parse(coinController.text));
                 } else {
                   selectedBidsList.insert(
                     0,
