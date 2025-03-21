@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<paths>
-<external-path name="external_files" path="." />
-<external-files-path name="files" path="." />
-
-<cache-path name="cache" path="." />
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="internal_apk_storage" path="ota_update/"/>
 </paths>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<paths>-->
+<!--<external-path name="external_files" path="." />-->
+<!--<external-files-path name="files" path="." />-->
+
+<!--<cache-path name="cache" path="." />-->
+<!--</paths>-->
+
 
 
 <!--    <?xml version="1.0" encoding="utf-8"?>-->

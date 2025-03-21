@@ -28,17 +28,19 @@ Future<void> _firebaseMessegingBackgroundHendler(RemoteMessage msg) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Permission.notification.request();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessegingBackgroundHendler);
   await GetStorage.init();
   final appStateListener = AppStateListener();
   WidgetsBinding.instance.addObserver(appStateListener);
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: AppColors.appBlueDarkColor,
     statusBarBrightness: Brightness.dark,
     statusBarIconBrightness: Brightness.light,
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(const MyApp());
 }
 
@@ -106,26 +108,29 @@ class _MyAppState extends State<MyApp> {
             onPointerHover: con.userLogIn,
             onPointerPanZoomStart: con.userLogIn,
             onPointerPanZoomUpdate: con.userLogIn,
-            child: GetMaterialApp(
-              title: 'SPL app',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-                scaffoldBackgroundColor: AppColors.white,
-                dialogTheme: DialogTheme(surfaceTintColor: AppColors.white),
-                appBarTheme: AppBarTheme(
-                  iconTheme: IconThemeData(color: AppColors.white),
-                  scrolledUnderElevation: 0,
+            child: SafeArea(
+              bottom: true,
+              child: GetMaterialApp(
+                title: 'SPL app',
+                theme: ThemeData(
+                  primarySwatch: Colors.blue,
+                  scaffoldBackgroundColor: AppColors.white,
+                  dialogTheme: DialogTheme(surfaceTintColor: AppColors.white),
+                  appBarTheme: AppBarTheme(
+                    iconTheme: IconThemeData(color: AppColors.white),
+                    scrolledUnderElevation: 0,
+                  ),
                 ),
+                defaultTransition: Transition.fadeIn,
+                debugShowCheckedModeBanner: false,
+                navigatorKey: navigatorKey,
+                // transitionDuration: const Duration(milliseconds: 500),
+                translations: AppLocalization(),
+                locale: getLocale(),
+                initialBinding: InitialBindings(),
+                initialRoute: AppRoutName.splashScreen,
+                getPages: AppRoutes.pages,
               ),
-              defaultTransition: Transition.fadeIn,
-              debugShowCheckedModeBanner: false,
-              navigatorKey: navigatorKey,
-              // transitionDuration: const Duration(milliseconds: 500),
-              translations: AppLocalization(),
-              locale: getLocale(),
-              initialBinding: InitialBindings(),
-              initialRoute: AppRoutName.splashScreen,
-              getPages: AppRoutes.pages,
             ),
           ),
         );

@@ -78,8 +78,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                   padding: const EdgeInsets.symmetric(vertical: 5),
                                   decoration: BoxDecoration(
                                       color: AppColors.appbarColor,
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(10.0), topLeft: Radius.circular(10.0))),
+                                      borderRadius: BorderRadius.only(topRight: Radius.circular(10.0), topLeft: Radius.circular(10.0))),
                                   child: Text(
                                     "SET FILTER",
                                     textAlign: TextAlign.center,
@@ -96,15 +95,14 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                     controller: homeCon.dateInputForResultHistory,
                                     style: CustomTextStyle.textRobotoSansMedium.copyWith(color: AppColors.appbarColor),
                                     decoration: InputDecoration(
-                                      hintText: "" /*DateFormat('dd-MM-yyyy').format(DateTime.now()).toString()*/,
+                                      hintText: DateFormat('dd-MM-yyyy').format(DateTime.now()).toString(),
                                       hintStyle: CustomTextStyle.textRobotoSansMedium.copyWith(
                                         color: AppColors.appbarColor,
                                       ),
                                       border: const OutlineInputBorder(
                                         borderSide: BorderSide.none,
                                       ),
-                                      contentPadding:
-                                          EdgeInsets.symmetric(horizontal: Dimensions.w8, vertical: Dimensions.h10),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: Dimensions.w8, vertical: Dimensions.h10),
                                       filled: true,
                                       fillColor: AppColors.grey.withOpacity(0.15),
                                       prefixIcon: Icon(Icons.calendar_month_sharp, color: AppColors.appbarColor),
@@ -115,16 +113,14 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                       print("fsdlfkjsdfklj");
                                       DateTime? pickedDate = await showDatePicker(
                                           context: context,
-                                          initialDate:
-                                              homeCon.date != null ? DateTime.parse(homeCon.date!) : DateTime.now(),
+                                          initialDate: homeCon.date != null ? DateTime.parse(homeCon.date!) : DateTime.now(),
                                           firstDate: DateTime(2000),
                                           lastDate: DateTime.now());
 
                                       if (pickedDate != null) {
                                         homeCon.bidHistoryDate = pickedDate;
 
-                                        homeCon.dateInputForResultHistory.text =
-                                            DateFormat('dd-MM-yyyy').format(pickedDate);
+                                        homeCon.dateInputForResultHistory.text = DateFormat('dd-MM-yyyy').format(pickedDate);
                                         homeCon.date = DateFormat('yyyy-MM-dd').format(pickedDate);
                                       }
                                     },
@@ -169,8 +165,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                             activeColor: AppColors.appbarColor,
                                                             value: e.isSelected.value,
                                                             onChanged: (bool? value) {
-                                                              homeCon.gameTypeList
-                                                                  .forEach((e) => e.isSelected.value = false);
+                                                              homeCon.gameTypeList.forEach((e) => e.isSelected.value = false);
                                                               e.isSelected.value = value ?? false;
                                                               if (e.isSelected.value) {
                                                                 homeCon.isSelectedGameIndex.value = e.id;
@@ -181,8 +176,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                           ),
                                                           Text(
                                                             e.name ?? "",
-                                                            style: CustomTextStyle.textRobotoSansMedium
-                                                                .copyWith(color: AppColors.black),
+                                                            style: CustomTextStyle.textRobotoSansMedium.copyWith(color: AppColors.black),
                                                           ),
                                                         ],
                                                       ),
@@ -206,8 +200,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                   .map(
                                                     (e) => InkWell(
                                                       onTap: () {
-                                                        homeCon.winStatusList
-                                                            .forEach((e) => e.isSelected.value = false);
+                                                        homeCon.winStatusList.forEach((e) => e.isSelected.value = false);
                                                         e.isSelected.value = !e.isSelected.value;
                                                         if (e.isSelected.value) {
                                                           homeCon.isSelectedWinStatusIndex.value = e.id;
@@ -221,8 +214,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                             activeColor: AppColors.appbarColor,
                                                             value: e.isSelected.value,
                                                             onChanged: (bool? value) {
-                                                              homeCon.winStatusList
-                                                                  .forEach((e) => e.isSelected.value = false);
+                                                              homeCon.winStatusList.forEach((e) => e.isSelected.value = false);
                                                               e.isSelected.value = value ?? false;
                                                               if (e.isSelected.value) {
                                                                 homeCon.isSelectedWinStatusIndex.value = e.id;
@@ -233,8 +225,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                           ),
                                                           Text(
                                                             e.name ?? "",
-                                                            style: CustomTextStyle.textRobotoSansMedium
-                                                                .copyWith(color: AppColors.black),
+                                                            style: CustomTextStyle.textRobotoSansMedium.copyWith(color: AppColors.black),
                                                           ),
                                                         ],
                                                       ),
@@ -256,10 +247,8 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                               : Obx(
                                                   () => ScrollbarTheme(
                                                     data: ScrollbarThemeData(
-                                                      thumbColor:
-                                                          MaterialStateProperty.all<Color>(AppColors.appbarColor),
-                                                      trackColor:
-                                                          MaterialStateProperty.all<Color>(AppColors.appbarColor),
+                                                      thumbColor: MaterialStateProperty.all<Color>(AppColors.appbarColor),
+                                                      trackColor: MaterialStateProperty.all<Color>(AppColors.appbarColor),
                                                     ),
                                                     child: Scrollbar(
                                                       trackVisibility: true,
@@ -273,8 +262,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                           children: homeCon.filterMarketList
                                                               .map(
                                                                 (e) => Padding(
-                                                                  padding: const EdgeInsets.symmetric(
-                                                                      vertical: 5.0, horizontal: 5.0),
+                                                                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
                                                                   child: Container(
                                                                     decoration: BoxDecoration(
                                                                       borderRadius: BorderRadius.circular(10),
@@ -291,8 +279,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                                       onTap: () {
                                                                         e.isSelected.value = !e.isSelected.value;
                                                                         if (e.isSelected.value) {
-                                                                          homeCon.selectedFilterMarketList
-                                                                              .add(e.id ?? 0);
+                                                                          homeCon.selectedFilterMarketList.add(e.id ?? 0);
                                                                         } else {
                                                                           homeCon.selectedFilterMarketList.clear();
                                                                         }
@@ -305,18 +292,16 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                                             onChanged: (bool? value) {
                                                                               e.isSelected.value = value ?? false;
                                                                               if (e.isSelected.value) {
-                                                                                homeCon.selectedFilterMarketList
-                                                                                    .add(e.id ?? 0);
+                                                                                homeCon.selectedFilterMarketList.add(e.id ?? 0);
                                                                               } else {
-                                                                                homeCon.selectedFilterMarketList
-                                                                                    .clear();
+                                                                                homeCon.selectedFilterMarketList.clear();
                                                                               }
                                                                             },
                                                                           ),
                                                                           Text(
                                                                             e.name ?? "",
-                                                                            style: CustomTextStyle.textRobotoSansMedium
-                                                                                .copyWith(color: AppColors.black),
+                                                                            style:
+                                                                                CustomTextStyle.textRobotoSansMedium.copyWith(color: AppColors.black),
                                                                           ),
                                                                           SizedBox(
                                                                             height: 5.0,
@@ -368,8 +353,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                   child: Center(
                                                     child: Text(
                                                       "SUBMIT",
-                                                      style: CustomTextStyle.textRobotoSansMedium
-                                                          .copyWith(color: AppColors.white),
+                                                      style: CustomTextStyle.textRobotoSansMedium.copyWith(color: AppColors.white),
                                                     ),
                                                   ),
                                                 ),
@@ -390,8 +374,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                                   child: Center(
                                                     child: Text(
                                                       "CANCEL",
-                                                      style: CustomTextStyle.textRobotoSansMedium
-                                                          .copyWith(color: AppColors.white),
+                                                      style: CustomTextStyle.textRobotoSansMedium.copyWith(color: AppColors.white),
                                                     ),
                                                   ),
                                                 ),
@@ -475,8 +458,7 @@ class _BidHistoryNewState extends State<BidHistoryNew> {
                                 closeTime: CommonUtils().formatStringToHHMMA(data.closeTime ?? ""),
                                 openTime: CommonUtils().formatStringToHHMMA(data.openTime ?? ""),
                                 transactiontype: data.marketName.toString(),
-                                timeDate:
-                                    CommonUtils().convertUtcToIstFormatStringToDDMMYYYYHHMMA(data.bidTime.toString()),
+                                timeDate: CommonUtils().convertUtcToIstFormatStringToDDMMYYYYHHMMA(data.bidTime.toString()),
                                 marketName: data.transactionType ?? "",
                                 gameMode: data.gameMode ?? "",
                                 bidType: data.bidType ?? "",
@@ -546,8 +528,7 @@ Widget listveiwTransactionNew({
                       const SizedBox(height: 2),
                       Text(
                         bidNo,
-                        style: CustomTextStyle.textRobotoMedium
-                            .copyWith(color: AppColors.appbarColor, fontSize: Dimensions.h13),
+                        style: CustomTextStyle.textRobotoMedium.copyWith(color: AppColors.appbarColor, fontSize: Dimensions.h13),
                       ),
                     ],
                   ),
@@ -560,8 +541,7 @@ Widget listveiwTransactionNew({
                       ),
                       Text(
                         " $coins",
-                        style: CustomTextStyle.textRobotoMedium
-                            .copyWith(fontSize: Dimensions.h14, color: AppColors.appbarColor),
+                        style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: Dimensions.h14, color: AppColors.appbarColor),
                       ),
                     ],
                   ),
@@ -580,8 +560,7 @@ Widget listveiwTransactionNew({
                 children: [
                   Text(
                     gameMode,
-                    style: CustomTextStyle.textRobotoMedium
-                        .copyWith(fontSize: Dimensions.h12, fontWeight: FontWeight.w500),
+                    style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: Dimensions.h12, fontWeight: FontWeight.w500),
                   ),
 
                   // Row(
@@ -610,8 +589,7 @@ Widget listveiwTransactionNew({
                 children: [
                   Text(
                     requestId,
-                    style: CustomTextStyle.textRobotoMedium
-                        .copyWith(fontSize: Dimensions.h12, fontWeight: FontWeight.w500),
+                    style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: Dimensions.h12, fontWeight: FontWeight.w500),
                   ),
                   const Expanded(child: SizedBox()),
                   SvgPicture.asset(
@@ -623,8 +601,7 @@ Widget listveiwTransactionNew({
                     child: Text(ballance,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: CustomTextStyle.textRobotoMedium
-                            .copyWith(fontSize: Dimensions.h12, fontWeight: FontWeight.w500)),
+                        style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: Dimensions.h12, fontWeight: FontWeight.w500)),
                   ),
                   SizedBox(height: Dimensions.h8),
                 ],

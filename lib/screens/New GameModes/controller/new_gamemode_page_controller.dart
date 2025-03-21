@@ -256,6 +256,9 @@ class NewGamemodePageController extends GetxController {
 
   List<String> getTwoDigitPanelPana(int inputNumber) {
     List<int> inputDigits = inputNumber.toString().split('').map(int.parse).toList();
+    if (inputDigits.length == 1) {
+      inputDigits.insert(0, 0);
+    }
     print("fsjdgjsdfsjd");
     print(inputNumber);
     print(inputDigits);
@@ -264,16 +267,54 @@ class NewGamemodePageController extends GetxController {
       String numStr = num.toString();
       print(numStr);
       print("kakakakakakka");
-      // return inputDigits.every((digit) => numStr.contains(digit.toString()));
-      if (inputNumber == 0) {
-        return numStr.contains("00");
-      } else if (inputDigits[0] == inputDigits[1]) {
-        return numStr.contains(inputNumber.toString());
-      } else {
-        return inputDigits.every((digit) => numStr.contains(digit.toString()));
+      if (inputDigits[0] == inputDigits[1]) {
+        print("fdsjfdkfjdhs${inputDigits}");
+        print("fsdjfhgsdjfsgdf");
+        return numStr.contains(inputNumber.toString()) && numStr.contains(inputDigits.join(""));
+      } else if (inputDigits[0] == 0) {
+        return inputDigits.every((digit) => numStr.contains(digit.toString())) && num.toString().startsWith(inputDigits[1].toString());
+      } else if (inputDigits[0] > 1) {
+        print("fdskfhsdkfshfksdhfskdjfh");
+        print(inputDigits);
+        if (inputDigits[1] == 0) {
+          return inputDigits.every((digit) => numStr.contains(digit.toString()));
+        } else if (inputDigits[0] > inputDigits[1]) {
+          return inputDigits.every((digit) => numStr.contains(digit.toString())) &&
+              num.toString().endsWith(inputDigits[0].toString()) &&
+              num.toString().startsWith(inputDigits[1].toString());
+        } else {
+          return inputDigits.every((digit) => numStr.contains(digit.toString()));
+        }
       }
+      return inputDigits.every((digit) => numStr.contains(digit.toString()));
+      // if (inputDigits[0] == 0) {
+      //   var start = inputDigits[0].toString();
+      //   print(start);
+      //   print("fdskjfghsdjkfhkfsdjkfh");
+      //   inputDigits.insert(0, 0);
+      //   // bool value = inputDigits.every((digit) {
+      //   //   return numStr.contains(digit.toString());
+      //   // });
+      //   // print("fsdhfgsdfjshfsk");
+      //   // print(value);
+      //   return inputDigits.every((digit) => numStr.contains(digit.toString())) && num.toString().startsWith(start);
+      // } else {
+      //   return inputDigits.every((digit) => numStr.contains(digit.toString())) ;
+      // }
+
+      // if (inputNumber == 0) {
+      //   return numStr.contains("00");
+      // }
+      /*else if (inputDigits[0] == inputDigits[1]) {
+        return numStr.contains(inputNumber.toString());
+      }*/
+      // else {
+      // return numStr.contains(inputNumber.toString());
+      // return inputDigits.every((digit) => numStr.contains(digit.toString()));
+      // }
     }
 
+    print("fdkjfdhsfkjdhfksjdhfkjdh");
     print(spdpMotor);
     print(spdpMotor.where(containsBothInputDigits).toList());
     return spdpMotor.where(containsBothInputDigits).toList();
@@ -411,7 +452,8 @@ class NewGamemodePageController extends GetxController {
   checkType(index) {
     if (selectedBidsList.elementAt(index).gameModeName!.contains("Ank")) {
       return "Ank";
-    } else if (selectedBidsList.elementAt(index).gameModeName!.contains("Jodi") || selectedBidsList.elementAt(index).gameModeName! == "Red Brackets") {
+    } else if (selectedBidsList.elementAt(index).gameModeName!.contains("Jodi") ||
+        selectedBidsList.elementAt(index).gameModeName! == "Red Brackets") {
       return "Jodi";
     } else {
       return "Pana";
