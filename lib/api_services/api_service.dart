@@ -1040,8 +1040,7 @@ class ApiService extends GetConnect implements GetxService {
     );
 
     if (kDebugMode) {
-      developer.log(
-          "RESPONSE HEADER:  ${response.request?.url}  RESPONSE HEADER:  ${response.request?.headers} RESPONSE : ${response.body}");
+      developer.log("RESPONSE HEADER:  ${response.request?.url}  RESPONSE HEADER:  ${response.request?.headers} RESPONSE : ${response.body}");
     }
     if (response.status.hasError) {
       AppUtils.hideProgressDialog();
@@ -1052,8 +1051,7 @@ class ApiService extends GetConnect implements GetxService {
     }
   }
 
-  Future<dynamic> bidHistoryByUserId(
-      {String? userId, String? gameType, String? winningStatus, List<int>? markets, String? date}) async {
+  Future<dynamic> bidHistoryByUserId({String? userId, String? gameType, String? winningStatus, List<int>? markets, String? date}) async {
     try {
       // AppUtils.showProgressDialog(isCancellable: false);
       await initApiService();
@@ -1072,8 +1070,7 @@ class ApiService extends GetConnect implements GetxService {
         },
       );
       if (kDebugMode) {
-        developer
-            .log("RESPONSE HEADER:  ${response.request?.url} RESPONSE : ${response.body} djhhs ${response.headers}");
+        developer.log("RESPONSE HEADER:  ${response.request?.url} RESPONSE : ${response.body} djhhs ${response.headers}");
       }
       if (response.status.hasError) {
         AppUtils.hideProgressDialog();
@@ -1155,8 +1152,8 @@ class ApiService extends GetConnect implements GetxService {
       headers: headersWithToken,
     );
     if (kDebugMode) {
-      developer.log(
-          "RESPONSE : ${response.body} RESPONSE REQUEST URI:  ${response.request?.url} RESPONSE REQUEST HEDER:  ${response.request?.headers}");
+      developer
+          .log("RESPONSE : ${response.body} RESPONSE REQUEST URI:  ${response.request?.url} RESPONSE REQUEST HEDER:  ${response.request?.headers}");
     }
     if (response.status.hasError) {
       // if (response.status.code != null && response.status.code == 401) {
@@ -1265,8 +1262,7 @@ class ApiService extends GetConnect implements GetxService {
       headers: headersWithToken,
     );
     if (kDebugMode) {
-      developer
-          .log("RESPONSE : ${response.body} RESPONSE HEADER:  ${response.request?.url} ${response.request?.headers}");
+      developer.log("RESPONSE : ${response.body} RESPONSE HEADER:  ${response.request?.url} ${response.request?.headers}");
     }
     if (response.status.hasError) {
       //  AppUtils.hideProgressDialog();
@@ -1348,8 +1344,7 @@ class ApiService extends GetConnect implements GetxService {
         headers: headersWithToken,
       );
       if (kDebugMode) {
-        developer.log(
-            "RESPONSE HEADER:  ${response.request?.url} RESPONSE : ${response.body} RESPONSE STATUS CODE:  ${response.statusCode} ");
+        developer.log("RESPONSE HEADER:  ${response.request?.url} RESPONSE : ${response.body} RESPONSE STATUS CODE:  ${response.statusCode} ");
       }
 
       if (response.status.hasError) {
@@ -1400,9 +1395,8 @@ class ApiService extends GetConnect implements GetxService {
   Future<dynamic> getTransactionSuccess({int? transactionId}) async {
     try {
       await initApiService();
-      final response = await GetConnect(timeout: const Duration(seconds: 15), allowAutoSignedCert: true).put(
-          ApiUtils.putWalletTransactionStatus, {"id": transactionId},
-          headers: headersWithToken, query: {"search": ""});
+      final response = await GetConnect(timeout: const Duration(seconds: 15), allowAutoSignedCert: true)
+          .put(ApiUtils.putWalletTransactionStatus, {"id": transactionId}, headers: headersWithToken, query: {"search": ""});
       if (response.status.hasError) {
         if (response.status.code != null && response.status.code == 401) {
           tokenExpired();

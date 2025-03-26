@@ -27,7 +27,7 @@ class SplashController extends GetxController {
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   UserDetailsModel _userDetailsModel = UserDetailsModel();
   DeviceInformationModel? deviceInfo;
-  String appVersion = "";
+
   RxString city = ''.obs;
   RxString country = ''.obs;
   RxString state = ''.obs;
@@ -110,17 +110,17 @@ class SplashController extends GetxController {
 
   getDeviceInfo() async {
     DeviceInformationModel deviceInfo = await DeviceInfo().initPlatformState();
-    appVersion = deviceInfo.appVersion.toString();
+    appVersion.value = deviceInfo.appVersion.toString();
   }
 
   void appVersionCheck() async {
     print("fsdfsdjkfsdkjfhskjfdf");
     ApiService().getAppVersion().then((value) async {
-      print(appVersion);
+      print(appVersion.value);
       print(value);
       if (value != null) {
         if (value['status']) {
-          if (value['data'] != appVersion) {
+          if (value['data'] != appVersion.value) {
             _showExitDialog();
             // print(value['data']);
           }
@@ -323,6 +323,8 @@ class SplashController extends GetxController {
               OtaUpdate().execute(ApiUtils.getApk).listen(
                 (OtaEvent event) {
                   if (event.status == OtaStatus.DOWNLOADING) {
+                    print("fsdfkjdshfksjdfhk");
+                    print(event.value);
                     load.value = true;
                   } else if (event.status == OtaStatus.CANCELED) {
                     load.value = false;

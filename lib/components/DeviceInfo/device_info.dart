@@ -2,10 +2,15 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:unique_identifier/unique_identifier.dart';
 
 import 'device_information_model.dart';
+
+RxString appVersion = "".obs;
+RxString newAppVersion = "".obs;
+RxBool dialogShown = false.obs;
 
 class DeviceInfo {
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();

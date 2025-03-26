@@ -44,8 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("fdsfdsjfhkfkjsdhjk");
-    print(homeCon.notificationData.length);
     return RefreshIndicator(
       onRefresh: () async {
         homeCon.getBannerData();
@@ -58,8 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.appbarColor,
           title: Text("SPL",
-              style: CustomTextStyle.textRamblaMedium
-                  .copyWith(color: Colors.white, fontSize: Dimensions.h20, fontWeight: FontWeight.w700)),
+              style: CustomTextStyle.textRamblaMedium.copyWith(color: Colors.white, fontSize: Dimensions.h20, fontWeight: FontWeight.w700)),
           centerTitle: true,
           leadingWidth: Get.width * 0.4,
           leading: Row(
@@ -175,9 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Obx(
                     () => homeCon.bannerData.isNotEmpty
                         ? CarouselSlider(
-                            items: homeCon.bannerData
-                                .where((p0) => p0.isActive! && p0.key != "starlinePageBanner")
-                                .map((element) {
+                            items: homeCon.bannerData.where((p0) => p0.isActive! && p0.key != "starlinePageBanner").map((element) {
                               return Builder(
                                 builder: (context) {
                                   return Padding(
@@ -246,8 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 15),
                                       Text(
                                         "SPL STARLINE",
-                                        style: CustomTextStyle.textRobotoMedium
-                                            .copyWith(color: AppColors.white, fontWeight: FontWeight.w600),
+                                        style: CustomTextStyle.textRobotoMedium.copyWith(color: AppColors.white, fontWeight: FontWeight.w600),
                                       )
                                     ],
                                   ),
@@ -281,8 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 15),
                                       Text(
                                         "ADD FUND",
-                                        style: CustomTextStyle.textRobotoMedium
-                                            .copyWith(color: AppColors.white, fontWeight: FontWeight.w600),
+                                        style: CustomTextStyle.textRobotoMedium.copyWith(color: AppColors.white, fontWeight: FontWeight.w600),
                                       )
                                     ],
                                   ),

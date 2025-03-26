@@ -6,8 +6,7 @@ import '../helper_files/ui_utils.dart';
 abstract class NetworkInfo {
   static Future<bool> checkNetwork() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    print("fsdkjfdhsfjkshfjksdhfskfjksd");
-    print(connectivityResult);
+
     if (connectivityResult.isNotEmpty) {
       if (connectivityResult[0] == ConnectivityResult.mobile) {
         Get.closeAllSnackbars();

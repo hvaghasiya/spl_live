@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,9 @@ import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'Push Notification/notificationservices.dart';
+import 'components/DeviceInfo/device_info.dart';
+import 'components/updatedialougue.dart';
+import 'components/versionchecker.dart';
 import 'firebase_options.dart';
 import 'helper_files/app_colors.dart';
 import 'helper_files/constant_variables.dart';
@@ -30,6 +34,18 @@ void main() async {
   Permission.notification.request();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessegingBackgroundHendler);
+  try {
+    final remoteConfig = FirebaseRemoteConfig.instance;
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: const Duration(minutes: 10),
+      minimumFetchInterval: const Duration(seconds: 0),
+    ));
+    await remoteConfig.fetchAndActivate();
+  } on FirebaseException catch (e) {
+    print('Firebase Error: ${e.code} - ${e.message}');
+  } catch (e) {
+    print('Unexpected error: $e');
+  }
   await GetStorage.init();
   final appStateListener = AppStateListener();
   WidgetsBinding.instance.addObserver(appStateListener);
@@ -41,7 +57,7 @@ void main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  runApp(const MyApp());
+  runApp(GlobalWrapper(child: const MyApp()));
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey(debugLabel: "Main Navigator");
@@ -56,10 +72,30 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final con = Get.put<InactivityController>(InactivityController());
   bool _jailbroken = false;
+  StreamSubscription? subscription;
+  getAppVersion() async {
+    FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+
+    subscription = remoteConfig.onConfigUpdated.listen((event) async {
+      print(event.updatedKeys);
+      print("Fsfkjdhsfskjfh");
+      await remoteConfig.fetchAndActivate();
+      newAppVersion.value = remoteConfig.getString('AppVersion');
+      print(newAppVersion.value);
+      newAppVersion.refresh();
+    });
+
+    await remoteConfig.fetchAndActivate();
+    newAppVersion.value = remoteConfig.getString('AppVersion');
+    print("fgsdkjhsfkjshdf");
+    print(newAppVersion.value);
+    newAppVersion.refresh();
+  }
 
   @override
   void initState() {
     super.initState();
+    getAppVersion();
     NotificationServices().requestNotificationPermission();
     HttpOverrides.global = MyHttpOverrides();
     NotificationServices().firebaseInit(context);
@@ -111,6 +147,7 @@ class _MyAppState extends State<MyApp> {
             child: SafeArea(
               bottom: true,
               child: GetMaterialApp(
+                navigatorObservers: [VersionCheckObserver()],
                 title: 'SPL app',
                 theme: ThemeData(
                   primarySwatch: Colors.blue,
@@ -121,6 +158,7 @@ class _MyAppState extends State<MyApp> {
                     scrolledUnderElevation: 0,
                   ),
                 ),
+
                 defaultTransition: Transition.fadeIn,
                 debugShowCheckedModeBanner: false,
                 navigatorKey: navigatorKey,
@@ -192,5 +230,28 @@ class AppStateListener extends WidgetsBindingObserver {
         GetStorage().write(ConstantsVariables.timeOut, false);
         break;
     }
+  }
+}
+
+class GlobalWrapper extends StatelessWidget {
+  final Widget child;
+  const GlobalWrapper({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Stack(
+        children: [
+          child,
+          Obx(() {
+            print(newAppVersion.value);
+            print(appVersion.value);
+            print("sffjkhfkjfhdksfsdf");
+            return newAppVersion.value.isNotEmpty && appVersion.isNotEmpty && newAppVersion.value != appVersion.value ? UpdateDialog() : SizedBox();
+          }),
+        ],
+      ),
+    );
   }
 }

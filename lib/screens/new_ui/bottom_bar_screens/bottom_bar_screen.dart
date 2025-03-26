@@ -1,16 +1,17 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../Custom Controllers/wallet_controller.dart';
+import '../../../components/DeviceInfo/device_info.dart';
 import '../../../controller/home_controller.dart';
 import '../../../controller/passbook_controller.dart';
 import '../../../controller/starline_market_controller.dart';
 import '../../../helper_files/app_colors.dart';
 import '../../../helper_files/constant_image.dart';
 import '../../../helper_files/custom_text_style.dart';
-
 
 class BottomBarScreen extends StatefulWidget {
   const BottomBarScreen({super.key});
@@ -24,6 +25,10 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
   final walletCon = Get.put<WalletController>(WalletController());
   final starlineCon = Get.put<StarlineMarketController>(StarlineMarketController());
   final passbookCon = Get.put<PassbookHistoryController>(PassbookHistoryController());
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +38,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
         if (value) {
           return;
         }
-        if (homeCon.pageWidget.value == 1 ||
-            homeCon.pageWidget.value == 2 ||
-            homeCon.pageWidget.value == 3 ||
-            homeCon.pageWidget.value == 4) {
+        if (homeCon.pageWidget.value == 1 || homeCon.pageWidget.value == 2 || homeCon.pageWidget.value == 3 || homeCon.pageWidget.value == 4) {
           print("OR VALUE: ${homeCon.pageWidget.value}");
           if (walletCon.selectedIndex.value != null) {
             walletCon.selectedIndex.value = null;
@@ -72,13 +74,24 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
             selectedItemColor: AppColors.appbarColor,
             unselectedLabelStyle: CustomTextStyle.textPTsansMedium.copyWith(fontSize: 14),
             selectedLabelStyle: CustomTextStyle.textPTsansMedium.copyWith(fontSize: 14),
-            onTap: (v) {
+            onTap: (v) async {
               homeCon.pageWidget.value = v;
+
               if (homeCon.pageWidget.value == 2) {
                 walletCon.selectedIndex.value = null;
               }
               if (homeCon.pageWidget.value != 3) {
                 SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+              }
+              if (dialogShown.value == false) {
+                FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+
+                await remoteConfig.fetchAndActivate();
+
+                newAppVersion.value = remoteConfig.getString('AppVersion');
+                print("gdfgdfgdfgdgdfgf");
+                print(newAppVersion.value);
+                newAppVersion.refresh();
               }
             },
             items: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+
 // import 'package:spllive/Custom%20Controllers/wallet_controller.dart';
 // import 'package:spllive/controller/home_controller.dart';
 // import 'package:spllive/helper_files/app_colors.dart';
@@ -10,6 +11,7 @@ import 'package:get/get.dart';
 // import 'package:spllive/routes/app_routes_name.dart';
 
 import '../../Custom Controllers/wallet_controller.dart';
+import '../../components/DeviceInfo/device_info.dart';
 import '../../controller/home_controller.dart';
 import '../../helper_files/app_colors.dart';
 import '../../helper_files/constant_image.dart';
@@ -128,10 +130,7 @@ class _MoreOptionsState extends State<MoreOptions> {
                 ),
                 Divider(color: AppColors.grey, endIndent: 10, indent: 20),
                 SizedBox(height: Dimensions.h5),
-                listItems(
-                    onTap: () => Get.toNamed(AppRoutName.profilePage),
-                    iconData: ConstantImage.bankAccountNew,
-                    text: "Change Password".tr),
+                listItems(onTap: () => Get.toNamed(AppRoutName.profilePage), iconData: ConstantImage.bankAccountNew, text: "Change Password".tr),
                 listItems(
                     onTap: () {
                       homeController.pageWidget.value = 2;
@@ -164,14 +163,9 @@ class _MoreOptionsState extends State<MoreOptions> {
                     },
                     iconData: ConstantImage.plusIcon,
                     text: "ADDFUND".tr),
+                listItems(onTap: () => Get.toNamed(AppRoutName.gameRatePage), iconData: ConstantImage.gameRate, text: "GAMERATE".tr),
                 listItems(
-                    onTap: () => Get.toNamed(AppRoutName.gameRatePage),
-                    iconData: ConstantImage.gameRate,
-                    text: "GAMERATE".tr),
-                listItems(
-                    onTap: () => Get.toNamed(AppRoutName.notificationDetailsPage),
-                    iconData: ConstantImage.notifiacation,
-                    text: "NOTIFICATIONS".tr),
+                    onTap: () => Get.toNamed(AppRoutName.notificationDetailsPage), iconData: ConstantImage.notifiacation, text: "NOTIFICATIONS".tr),
                 // listItems(
                 //     onTap: () {
                 //       GetStorage().write(ConstantsVariables.withDrawal, true);
@@ -210,10 +204,9 @@ class _MoreOptionsState extends State<MoreOptions> {
           ),
         ),
         Text(
-          "Version: 2.0.1",
+          "Version: ${appVersion.value}",
           textAlign: TextAlign.center,
-          style: CustomTextStyle.textRobotoSansMedium
-              .copyWith(fontSize: Dimensions.h14, color: AppColors.textColor, fontWeight: FontWeight.w400),
+          style: CustomTextStyle.textRobotoSansMedium.copyWith(fontSize: Dimensions.h14, color: AppColors.textColor, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 10),
       ],
@@ -247,9 +240,7 @@ Widget listItems({required Function() onTap, required String iconData, required 
               SizedBox(
                 width: Dimensions.w15,
               ),
-              Text(text,
-                  style:
-                      CustomTextStyle.textRobotoMedium.copyWith(fontSize: Dimensions.h14, fontWeight: FontWeight.w500))
+              Text(text, style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: Dimensions.h14, fontWeight: FontWeight.w500))
             ],
           ),
         ),

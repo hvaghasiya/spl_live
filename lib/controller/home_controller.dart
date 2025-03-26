@@ -21,7 +21,6 @@ import '../screens/bottum_navigation_screens/passbook_page.dart';
 import '../screens/bottum_navigation_screens/spl_wallet.dart';
 import '../screens/new_ui/bottom_bar_screens/home_screen.dart';
 
-
 class HomeController extends GetxController {
   RxInt pageWidget = 0.obs;
   final notificationCount = Rxn<int>();
@@ -40,13 +39,13 @@ class HomeController extends GetxController {
       case 0:
         return const HomeScreen();
       case 1:
-        return BidHistoryBottom();
+        return const BidHistoryBottom();
       case 2:
-        return SPLWallet();
+        return const SPLWallet();
       case 3:
-        return PassBook();
+        return const PassBook();
       case 4:
-        return MoreOptions();
+        return const MoreOptions();
     }
   }
 
@@ -108,13 +107,10 @@ class HomeController extends GetxController {
           });
           noMarketFound.value = false;
           var biddingOpenMarketList = normalMarketList
-              .where((element) =>
-                  (element.isBidOpenForClose == true || element.isBidOpenForOpen == true) && element.isBlocked == false)
+              .where((element) => (element.isBidOpenForClose == true || element.isBidOpenForOpen == true) && element.isBlocked == false)
               .toList();
           var biddingClosedMarketList = normalMarketList
-              .where((element) =>
-                  (element.isBidOpenForOpen == false && element.isBidOpenForClose == false) &&
-                  element.isBlocked == false)
+              .where((element) => (element.isBidOpenForOpen == false && element.isBidOpenForClose == false) && element.isBlocked == false)
               .toList();
           var tempFinalMarketList = <MarketData>[];
           biddingOpenMarketList.sort((a, b) {

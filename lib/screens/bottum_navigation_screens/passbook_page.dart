@@ -13,7 +13,7 @@ import '../../helper_files/dimentions.dart';
 import 'controller/bottum_navigation_controller.dart';
 
 class PassBook extends StatefulWidget {
-  PassBook({super.key});
+  const PassBook({super.key});
 
   @override
   State<PassBook> createState() => _PassBookState();
@@ -53,8 +53,7 @@ class _PassBookState extends State<PassBook> {
                       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                     }
                   } else {
-                    SystemChrome.setPreferredOrientations(
-                        [DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
                   }
                 },
                 child: Padding(
@@ -197,12 +196,8 @@ class _PassBookState extends State<PassBook> {
                     ),
                     dataCells(
                         width: Dimensions.w150,
-                        textColor: data.credit == "" || data.credit == "null" || data.credit == null
-                            ? AppColors.redColor
-                            : AppColors.green,
-                        text: data.credit == "" || data.credit == null
-                            ? "-${data.debit.toString()}"
-                            : "+${data.credit.toString()}"),
+                        textColor: data.credit == "" || data.credit == "null" || data.credit == null ? AppColors.redColor : AppColors.green,
+                        text: data.credit == "" || data.credit == null ? "-${data.debit.toString()}" : "+${data.credit.toString()}"),
                     dataCells(
                       width: Dimensions.w150,
                       textColor: AppColors.black,
