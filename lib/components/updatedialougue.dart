@@ -1,8 +1,8 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ota_update/ota_update.dart';
 
-import '../api_services/api_urls.dart';
 import '../helper_files/app_colors.dart';
 import '../helper_files/custom_text_style.dart';
 import '../helper_files/dimentions.dart';
@@ -21,7 +21,7 @@ class UpdateDialog extends StatelessWidget {
         child: Container(
           height: Get.height,
           width: Get.width,
-          color: Colors.black.withOpacity(0.5),
+          color: Colors.black.withOpacity(0.3),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -57,35 +57,47 @@ class UpdateDialog extends StatelessWidget {
                       GestureDetector(
                         onTap: () async {
                           // launch("https://spl.live");
-                          print("fdsfksjfhkfsfkjshfsjdhfkdsfs");
+                          print("fdsfksjfhkfsfkjshfsjdhfkdsfs $load");
                           // downloadApk(ApiUtils.getApk);
-                          try {
-                            OtaUpdate().execute(ApiUtils.getApk).listen(
-                              (OtaEvent event) {
-                                if (event.status == OtaStatus.DOWNLOADING) {
-                                  print("fsdfkjdshfksjdfhk");
-                                  print(event.value);
-                                  percentage.value = event.value!;
-                                  load.value = true;
-                                } else if (event.status == OtaStatus.CANCELED) {
-                                  load.value = false;
-                                  AppUtils.showErrorSnackBar(bodyText: "Download Canceled");
-                                } else if (event.status == OtaStatus.DOWNLOAD_ERROR) {
-                                  load.value = false;
-                                  AppUtils.showErrorSnackBar(bodyText: "Download error");
-                                } else if (event.status == OtaStatus.INTERNAL_ERROR) {
-                                  load.value = false;
-                                  AppUtils.showErrorSnackBar(bodyText: "Something went wrong");
-                                } else if (event.status == OtaStatus.PERMISSION_NOT_GRANTED_ERROR) {
-                                  load.value = false;
-                                } else {
-                                  load.value = false;
-                                }
-                              },
-                              onDone: () => load.value = false,
-                            );
-                          } catch (e) {
-                            print('Failed to make OTA update. Details: $e');
+                          if (load.value == false) {
+                            try {
+                              load.value = true;
+                              FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+                              await remoteConfig.fetchAndActivate();
+                              var applink = remoteConfig.getString('AppLink');
+
+                              // OtaUpdate().execute(ApiUtils.getApk).listen(
+                              OtaUpdate().execute(applink).listen(
+                                (OtaEvent event) {
+                                  if (event.status == OtaStatus.DOWNLOADING) {
+                                    print("fsdfkjdshfksjdfhk");
+                                    print(event.value);
+                                    percentage.value = event.value!;
+                                  } else if (event.status == OtaStatus.CANCELED) {
+                                    load.value = false;
+                                    // AppUtils().accountFlowDialog(msg: "Download Canceled");
+                                    AppUtils.showErrorSnackBar(bodyText: "Download Canceled");
+                                  } else if (event.status == OtaStatus.DOWNLOAD_ERROR) {
+                                    load.value = false;
+                                    // AppUtils().accountFlowDialog(msg: "Download error");
+                                    AppUtils.showErrorSnackBar(bodyText: "Download error");
+                                  } else if (event.status == OtaStatus.INTERNAL_ERROR) {
+                                    load.value = false;
+                                    // AppUtils().accountFlowDialog(msg: "Something went wrong");
+                                    AppUtils.showErrorSnackBar(bodyText: "Something went wrong");
+                                  } else if (event.status == OtaStatus.PERMISSION_NOT_GRANTED_ERROR) {
+                                    load.value = false;
+                                  } else {
+                                    load.value = false;
+                                  }
+                                },
+                                onDone: () => load.value = false,
+                              );
+                            } catch (e) {
+                              print('Failed to make OTA update. Details: $e');
+                              AppUtils.showErrorSnackBar(bodyText: "Something went wrong");
+                              // AppUtils().accountFlowDialog(msg: e.toString());
+                            }
                           }
                         },
                         child: Container(
