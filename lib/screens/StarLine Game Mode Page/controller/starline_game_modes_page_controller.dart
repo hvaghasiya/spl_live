@@ -1,20 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:spllive/helper_files/ui_utils.dart';
+
 import '../../../api_services/api_service.dart';
 import '../../../helper_files/common_utils.dart';
 import '../../../helper_files/constant_variables.dart';
 import '../../../models/commun_models/starline_bid_request_model.dart';
-import '../../../models/commun_models/user_details_model.dart';
-import '../../../models/daily_market_api_response_model.dart';
 import '../../../models/starline_daily_market_api_response.dart';
 import '../../../models/starline_game_modes_api_response_model.dart';
 import '../../../routes/app_routes_name.dart';
-import '../../Local Storage.dart';
 
 class StarLineGameModesPageController extends GetxController {
   var arguments = Get.arguments;
@@ -27,49 +24,31 @@ class StarLineGameModesPageController extends GetxController {
   RxString totalAmount = "00".obs;
   bool getBidData = false;
   num count = 0;
+  // var argument = Get.arguments;
+  // RxList<StarLineBids> selectedBidsList = <StarLineBids>[].obs;
   @override
   void onInit() async {
     super.onInit();
-    // This code will be executed after 3 secondsa
-    getBool();
-    // print(getBidData);
-    Timer(
-      const Duration(seconds: 1),
-      () {
-        if (!getBidData) {
-          marketData.value = arguments['marketData'];
-        }
-        checkBiddingStatus();
-        callGetGameModes();
-      },
-    );
+    marketData.value = arguments;
+    checkBiddingStatus();
+    GetStorage().write(ConstantsVariables.starlineConnect, true);
+    callGetGameModes();
+  }
+
+  onBackButton() async {
+    Get.back();
+    // Get.offAll(() => const StarlineDailyMarketData());
+    requestModel.value.bids?.clear();
+    GetStorage().write(ConstantsVariables.starlineBidsList, requestModel.value.bids);
   }
 
   @override
-  onClose() async {
-    await LocalStorage.write(ConstantsVariables.boolData, false);
-  }
-
-  Future<void> getArguments() async {
-    gameMode.value = arguments['gameMode'];
-    marketData.value = arguments['marketData'];
-    requestModel.value.bids = arguments['bidsList'];
-    requestModel.refresh();
-    _calculateTotalAmount();
-    requestModel.value.dailyStarlineMarketId = marketData.value.id;
-    var data = await LocalStorage.read(ConstantsVariables.userData);
-    UserDetailsModel userData = UserDetailsModel.fromJson(data);
-    requestModel.value.userId = userData.id;
-  }
-
-  Future<void> getBool() async {
-    getBidData = await LocalStorage.read(ConstantsVariables.boolData);
-    print(count++);
-    print(getBidData);
-    if (getBidData) {
-      getArguments();
-    }
-    update();
+  void onClose() async {
+    requestModel.value.bids?.clear();
+    GetStorage().write(ConstantsVariables.playMore, true);
+    GetStorage().write(ConstantsVariables.totalAmount, "");
+    GetStorage().write(ConstantsVariables.marketName, "");
+    super.onClose();
   }
 
   void _calculateTotalAmount() {
@@ -85,50 +64,108 @@ class StarLineGameModesPageController extends GetxController {
   }
 
   void callGetGameModes() async {
-    ApiService()
-        .getStarLineGameModes(marketID: marketData.value.id ?? 0)
-        .then((value) async {
-      print("Get StarLine Game Modes Api Response :- $value");
-      if (value['status']) {
-        StarLineGameModesApiResponseModel gameModeModel =
-            StarLineGameModesApiResponseModel.fromJson(value);
-        if (gameModeModel.data != null) {
-          biddingOpen.value = gameModeModel.data!.isBidOpen ?? false;
-          gameModesList.value =
-              gameModeModel.data!.gameMode ?? <StarLineGameMod>[];
+    ApiService().getStarLineGameModes(marketID: marketData.value.id ?? 0).then(
+      (value) async {
+        if (value['status']) {
+          StarLineGameModesApiResponseModel gameModeModel = StarLineGameModesApiResponseModel.fromJson(value);
+          if (gameModeModel.data != null) {
+            biddingOpen.value = gameModeModel.data!.isBidOpen ?? false;
+            gameModesList.value = gameModeModel.data!.gameMode ?? <StarLineGameMod>[];
+          }
+        } else {
+          AppUtils.showErrorSnackBar(
+            bodyText: value['message'] ?? "",
+          );
         }
-      } else {
-        AppUtils.showErrorSnackBar(
-          bodyText: value['message'] ?? "",
-        );
-      }
-    });
+      },
+    );
   }
 
   void checkBiddingStatus() {
-    var timeDiffForOpenBidding = CommonUtils()
-        .getDifferenceBetweenGivenTimeFromNow(
-            marketData.value.time ?? "00:00 AM");
-
+    var timeDiffForOpenBidding =
+        CommonUtils().getDifferenceBetweenGivenTimeFromNow(marketData.value.time ?? "00:00 AM");
     timeDiffForOpenBidding < 15 ? biddingOpen.value = false : true;
-
-    if (!biddingOpen.value) {}
   }
 
   void onTapOfGameModeTile(int index) async {
-    await LocalStorage.write(ConstantsVariables.boolData, getBidData);
-    Get.offAndToNamed(AppRoutName.starLineGamePage, arguments: {
-      "gameMode": gameModesList[index],
-      "marketData": marketData.value,
-      "getBidData": getBidData
-    });
+    bool isBulkMode = false;
+    switch (gameModesList[index].name) {
+      case "Single Ank":
+        isBulkMode = false;
+        break;
+      case "Single Pana":
+        isBulkMode = false;
+        break;
+      case "Double Pana":
+        isBulkMode = false;
+        break;
+      case "Tripple Pana":
+        isBulkMode = false;
+        break;
+      case "Single Ank Bulk":
+        isBulkMode = true;
+        break;
+      case "Jodi Bulk":
+        isBulkMode = true;
+        break;
+      case "Single Pana Bulk":
+        isBulkMode = true;
+        break;
+      case "Double Pana Bulk":
+        isBulkMode = true;
+        break;
+
+      case "Panel Group":
+        isBulkMode = false;
+        break;
+      case "SP Motor":
+        isBulkMode = false;
+        break;
+      case "DP Motor":
+        isBulkMode = false;
+        break;
+      case "SPDPTP":
+        isBulkMode = false;
+        break;
+      case "Digit Based Jodi":
+        isBulkMode = false;
+        break;
+      case "Choice Pana SPDP":
+        isBulkMode = false;
+        break;
+      case "Two Digits Panel":
+        isBulkMode = false;
+        break;
+      case "Odd Even":
+        isBulkMode = false;
+        break;
+
+      default:
+    }
+
+    if (isBulkMode) {
+      Get.toNamed(AppRoutName.starLineGamePage, arguments: {
+        "gameMode": gameModesList[index],
+        //   "gameModeName": gameModesList[index].name,
+        "marketData": marketData.value,
+        "getBidData": getBidData,
+        "getBIdType": gameModesList[index].name,
+      });
+    } else {
+      Get.toNamed(AppRoutName.newStarlineGames, arguments: {
+        "gameMode": gameModesList[index],
+        "gameModeName": gameModesList[index].name,
+        "marketData": marketData.value,
+        "getBidData": getBidData,
+        "getBIdType": gameModesList[index].name,
+      });
+    }
   }
 
   void onDeleteBids(int index) {
     requestModel.value.bids!.remove(requestModel.value.bids![index]);
     requestModel.refresh();
     _calculateTotalAmount();
-
     if (requestModel.value.bids!.isEmpty) {
       Get.back();
       Get.back();
@@ -136,31 +173,62 @@ class StarLineGameModesPageController extends GetxController {
   }
 
   void createMarketBidApi() async {
-    ApiService()
-        .createStarLineMarketBid(requestModel.value.toJson())
-        .then((value) async {
-      debugPrint("create starline bid api response :- $value");
+    ApiService().createStarLineMarketBid(requestModel.value.toJson()).then((value) async {
       if (value['status']) {
         Get.back();
         Get.back();
         if (value['data'] == false) {
           Get.back();
-          AppUtils.showErrorSnackBar(
-            bodyText: value['message'] ?? "",
-          );
+          AppUtils.showErrorSnackBar(bodyText: value['message'] ?? "");
         } else {
-          AppUtils.showSuccessSnackBar(
-              bodyText: value['message'] ?? "",
-              headerText: "SUCCESSMESSAGE".tr);
+          AppUtils.showSuccessSnackBar(bodyText: value['message'] ?? "", headerText: "SUCCESSMESSAGE".tr);
         }
-        LocalStorage.remove(ConstantsVariables.bidsList);
-        LocalStorage.remove(ConstantsVariables.marketName);
-        LocalStorage.remove(ConstantsVariables.biddingType);
+        GetStorage().remove(ConstantsVariables.bidsList);
+        GetStorage().remove(ConstantsVariables.marketName);
+        GetStorage().remove(ConstantsVariables.biddingType);
       } else {
-        AppUtils.showErrorSnackBar(
-          bodyText: value['message'] ?? "",
-        );
+        AppUtils.showErrorSnackBar(bodyText: value['message'] ?? "");
       }
     });
   }
+
+  // void showConfirmationDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: const Text('Confirm!'),
+  //         content: Text(
+  //           'Do you really wish to submit?',
+  //           style: CustomTextStyle.textRobotoSansLight.copyWith(
+  //             color: AppColors.grey,
+  //             fontSize: Dimensions.h14,
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Get.back(),
+  //             child: Text(
+  //               'CANCLE',
+  //               style: CustomTextStyle.textPTsansBold.copyWith(
+  //                 color: AppColors.appbarColor,
+  //                 fontSize: Dimensions.h13,
+  //               ),
+  //             ),
+  //           ),
+  //           TextButton(
+  //             onPressed: () => createMarketBidApi(),
+  //             child: Text(
+  //               'OKAY',
+  //               style: CustomTextStyle.textPTsansBold.copyWith(
+  //                 color: AppColors.appbarColor,
+  //                 fontSize: Dimensions.h13,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 }

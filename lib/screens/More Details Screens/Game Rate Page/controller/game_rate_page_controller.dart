@@ -15,25 +15,13 @@ class GameRatePageController extends GetxController {
     getGameRates(forStarlineGameModes: false);
   }
 
-  @override
-  void onClose() {}
-
-  @override
-  void onReady() {}
-
   void getGameRates({required bool forStarlineGameModes}) {
-    ApiService()
-        .getGameRates(forStarlineGameModes: forStarlineGameModes)
-        .then((value) async {
-      print("Get withdrawal time Api Response :- $value");
+    ApiService().getGameRates(forStarlineGameModes: forStarlineGameModes).then((value) async {
       if (value['status']) {
         if (forStarlineGameModes) {
-          starlineMarketModel.value =
-              MarketRatesApiResponseModel.fromJson(value);
-          print(starlineMarketModel.value);
+          starlineMarketModel.value = MarketRatesApiResponseModel.fromJson(value);
         } else {
           normalMarketModel.value = MarketRatesApiResponseModel.fromJson(value);
-          print(normalMarketModel.value);
         }
       } else {
         AppUtils.showErrorSnackBar(

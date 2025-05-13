@@ -15,18 +15,16 @@ class Dimensions {
           : sf < 1
               ? 1.2
               : 1;
-      debugPrint("Text Scale Factor is :- $sf");
+      // debugPrint("Text Scale Factor is :- $sf");
     } else {
       sf = MediaQuery.of(context).textScaleFactor;
     }
   }
 
   static double getDevicePpi() {
-    final mediaQuery =
-        MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    final mediaQuery = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
     final size = mediaQuery.size;
-    final diagonalInches =
-        sqrt(size.width * size.width + size.height * size.height);
+    final diagonalInches = sqrt(size.width * size.width + size.height * size.height);
     final diagonalPixels = diagonalInches * mediaQuery.devicePixelRatio;
     final ppi = diagonalPixels / diagonalInches;
     return ppi;
@@ -458,44 +456,6 @@ class Dimensions {
   static double r500 = 500.r;
 
   static double commonPaddingForScreen = Dimensions.w20;
-
-  // static double getSafeAreaBottomHeight() {
-  //   return MediaQuery.of(NavigationService.instance.appContext).padding.bottom;
-  // }
-  //
-  // static double getBottomButtonHeight() {
-  //   return 52.0 +
-  //       MediaQuery.of(NavigationService.instance.appContext).padding.bottom;
-  // }
-  //
-  // static double getImagePaddingFromTopHeight() {
-  //   return h20 +
-  //       MediaQuery.of(NavigationService.instance.appContext).padding.top;
-  // }
-  //
-  // static double getSafeAreaTopHeight() {
-  //   return MediaQuery.of(NavigationService.instance.appContext).padding.top;
-  // }
-  //
-  // static double bottomPadding() {
-  //   return buttonHeight() +
-  //       MediaQuery.of(NavigationService.instance.appContext).padding.bottom;
-  // }
-  //
-  // static double screenWidth() {
-  //   return MediaQuery.of(NavigationService.instance.appContext).size.width;
-  // }
-  //
-  // static double screenHeight() {
-  //   return MediaQuery.of(NavigationService.instance.appContext).size.height;
-  // }
-  //
-  // static double getKeyBoardHeight() {
-  //   return MediaQuery.of(NavigationService.instance.appContext)
-  //       .viewInsets
-  //       .bottom;
-  // }
-
   static double buttonHeight() {
     return AppBar().preferredSize.height;
   }

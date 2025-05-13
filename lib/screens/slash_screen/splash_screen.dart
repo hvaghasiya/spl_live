@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:spllive/helper_files/app_colors.dart';
 import 'package:spllive/helper_files/constant_image.dart';
 
+import '../../helper_files/dimentions.dart';
 import 'controller/splash_screen_controller.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class SplashScreen extends StatelessWidget {
   final splashScreenController = Get.find<SplashController>();
   @override
   Widget build(BuildContext context) {
+    Dimensions.initDimension(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(

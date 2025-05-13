@@ -20,7 +20,7 @@ class RoundedCornerButton extends StatelessWidget {
   String text;
   Color color;
   Color borderColor;
-  Function onTap;
+  Function() onTap;
   double fontSize, letterSpacing, borderRadius, borderWidth, height, width;
   FontWeight fontWeight;
   Color fontColor;
@@ -29,7 +29,7 @@ class RoundedCornerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => onTap(),
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: borderColor, width: borderWidth),
@@ -39,13 +39,16 @@ class RoundedCornerButton extends StatelessWidget {
         height: height,
         width: width,
         child: Center(
-          child: Text(
-            text,
-            style: textStyle.copyWith(
-              color: fontColor,
-              fontWeight: fontWeight,
-              fontSize: fontSize,
-              letterSpacing: letterSpacing,
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text(
+              text,
+              style: textStyle.copyWith(
+                color: fontColor,
+                fontWeight: fontWeight,
+                fontSize: fontSize,
+                letterSpacing: letterSpacing,
+              ),
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
@@ -20,8 +21,7 @@ class GetXNetworkManager extends GetxController {
   @override
   void onInit() {
     getConnectionType();
-    _streamSubscription =
-        _connectivity.onConnectivityChanged.listen(_updateState);
+    _streamSubscription = _connectivity.onConnectivityChanged.listen(_updateState);
     super.onInit();
   }
 
@@ -31,7 +31,7 @@ class GetXNetworkManager extends GetxController {
     try {
       connectivityResult = await (_connectivity.checkConnectivity());
     } on PlatformException catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     return _updateState(connectivityResult);
   }
@@ -42,20 +42,18 @@ class GetXNetworkManager extends GetxController {
     switch (result) {
       case ConnectivityResult.wifi:
         connectionType = 1;
-        if(isInternetDisconnected){
-        isInternetReConnected.value = true;
-        isInternetReConnected.refresh();
-
+        if (isInternetDisconnected) {
+          isInternetReConnected.value = true;
+          isInternetReConnected.refresh();
         }
         isInternetDisconnected = false;
 
         break;
       case ConnectivityResult.mobile:
         connectionType = 2;
-        if(isInternetDisconnected ){
+        if (isInternetDisconnected) {
           isInternetReConnected.value = true;
           isInternetReConnected.refresh();
-
         }
         isInternetDisconnected = false;
 
@@ -65,7 +63,6 @@ class GetXNetworkManager extends GetxController {
         isInternetDisconnected = true;
         isInternetReConnected.value = false;
         isInternetReConnected.refresh();
-
 
         break;
       default:

@@ -23,6 +23,8 @@ class AutoCompleteTextField extends StatelessWidget {
     this.focusNode,
     this.maxLength = 2,
     this.formatter,
+    this.hintTextColor,
+    this.textStyle,
   }) : super(key: key);
 
   double height, suggestionWidth;
@@ -35,6 +37,8 @@ class AutoCompleteTextField extends StatelessWidget {
   TextInputType keyboardType;
   FocusNode? focusNode;
   TextEditingController controller;
+  Color? hintTextColor;
+  TextStyle? textStyle;
   FutureOr<Iterable<String>> Function(TextEditingValue) optionsBuilder;
   Function(bool, String) validateValue;
 
@@ -46,13 +50,29 @@ class AutoCompleteTextField extends StatelessWidget {
       ),
     );
     return Container(
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            offset: const Offset(2, 2),
-            blurRadius: 5,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(Dimensions.r10)),
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            offset: const Offset(0, 4),
+            blurRadius: 3,
             spreadRadius: 0.2,
-            color: AppColors.grey)
-      ]),
+            color: AppColors.grey.withOpacity(0.7),
+          ),
+        ],
+      ),
+      // decoration: BoxDecoration(
+      //   color: AppColors.white,
+      //   borderRadius: BorderRadius.all(Radius.circular(Dimensions.r10)),
+      //   boxShadow: [
+      //     BoxShadow(
+      //         offset: const Offset(2, 2),
+      //         blurRadius: 5,
+      //         spreadRadius: 0.2,
+      //         color: AppColors.grey)
+      //   ],
+      // ),
       height: height,
       width: width,
       child: RawAutocomplete(
@@ -63,30 +83,35 @@ class AutoCompleteTextField extends StatelessWidget {
             (context, textEditingController, focusNod, onFieldSubmitted) {
           return TextFormField(
             textInputAction: TextInputAction.next,
-            style: CustomTextStyle.textPTsansMedium.copyWith(
-              color: AppColors.appbarColor,
-              fontWeight: FontWeight.normal,
-              fontSize: Dimensions.h16,
-            ),
+            style: textStyle ??
+                CustomTextStyle.textRobotoSansMedium.copyWith(
+                  color: AppColors.black.withOpacity(0.65),
+                  fontSize: Dimensions.h16,
+                ),
+            cursorColor: AppColors.black,
             controller: textEditingController,
             focusNode: focusNode,
             autofocus: autoFocus!,
             inputFormatters: formatter,
             maxLength: maxLength,
+            
             onFieldSubmitted: (String value) {
               if (isBulkMode ?? false) {
                 textEditingController.clear();
+              } else {
+                onFieldSubmitted;
               }
             },
             keyboardType: keyboardType,
             onChanged: (val) {
               validateValue(false, val);
             },
+            textAlign: TextAlign.center,
             decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: Dimensions.w12),
-              focusColor: AppColors.black,
+              contentPadding: EdgeInsets.only(right: Dimensions.w20),
+              focusColor: AppColors.white,
               filled: true,
-              fillColor: AppColors.white,
+              fillColor: AppColors.grey.withOpacity(0.2),
               counterText: "",
               focusedBorder: border,
               border: border,
@@ -95,10 +120,9 @@ class AutoCompleteTextField extends StatelessWidget {
               enabledBorder: border,
               errorMaxLines: 0,
               hintText: hintText,
-              hintStyle: CustomTextStyle.textPTsansBold.copyWith(
-                color: AppColors.grey,
-                fontSize: Dimensions.h16,
-                fontWeight: FontWeight.normal,
+              hintStyle: CustomTextStyle.textRobotoSansMedium.copyWith(
+                color: hintTextColor ?? AppColors.black.withOpacity(0.65),
+                fontSize: Dimensions.h15,
               ),
             ),
           );
@@ -145,8 +169,7 @@ class AutoCompleteTextField extends StatelessWidget {
           // );
         },
         onSelected: (String selection) {
-          debugPrint(
-              'Selected Suggestion of auto complete text field is $selection');
+          
         },
       ),
     );

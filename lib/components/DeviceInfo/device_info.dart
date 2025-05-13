@@ -1,8 +1,10 @@
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:unique_identifier/unique_identifier.dart';
+
 import 'device_information_model.dart';
 
 class DeviceInfo {
@@ -14,24 +16,37 @@ class DeviceInfo {
   String brandName = "";
   String manufacturer = "";
   String osVersion = "";
+  String identifier = "";
+  Future<void> initUniqueIdentifierState() async {
+    try {
+      identifier = (await UniqueIdentifier.serial)!;
+    } on PlatformException {
+      identifier = 'Failed to get Unique Identifier';
+    }
+  }
 
   Future<DeviceInformationModel> initPlatformState() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
+    initUniqueIdentifierState();
     var appVersion = packageInfo.version;
-
     var deviceData = <String, dynamic>{};
     try {
       if (Platform.isAndroid) {
         deviceType = "Android";
         deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
         var androidInfo = await deviceInfoPlugin.androidInfo;
-        deviceId = await androidInfo.id.toString();
-        print("device ID :---$deviceId");
+        // deviceId = androidInfo.id.toString();
+        deviceId = identifier;
         deviceModelNo = deviceData["model"] ?? "getting Null";
         manufacturer = deviceData["manufacturer"] ?? "getting Null";
         brandName = deviceData["brand"] ?? "getting Null";
         osVersion = deviceData["version.release"] ?? "getting Null";
+        // final serialNumber = deviceData['serialNumber'];
+        bool isRooted = androidInfo.isPhysicalDevice;
+        // bool jailBroken = await FlutterJailbreakDetection.jailbroken;
+        // if (isRooted == false) {
+        //   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        // }
       } else if (Platform.isIOS) {
         deviceType = "Ios";
         deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
@@ -42,9 +57,7 @@ class DeviceInfo {
         osVersion = deviceData["systemVersion"] ?? "getting Null";
       }
     } on PlatformException {
-      deviceData = <String, dynamic>{
-        'Error:': 'Failed to get platform version.'
-      };
+      deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
     }
     DeviceInformationModel model = DeviceInformationModel(
       appVersion: appVersion,
@@ -55,8 +68,7 @@ class DeviceInfo {
       manufacturer: manufacturer,
       osVersion: osVersion,
     );
-    print(
-        "User's device info :-\nappversion:-$appVersion\ndeviceId :- $deviceId\nmodel :- $deviceModelNo\ndeviceOs :- $deviceType\n brandName :- $brandName\n manufacturer :- $manufacturer\n osVersion :- $osVersion ");
+
     return model;
   }
 

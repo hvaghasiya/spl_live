@@ -1,57 +1,138 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:spllive/Custom%20Controllers/wallet_controller.dart';
-import 'package:spllive/helper_files/ui_utils.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../components/bottumnavigation/bottumnavigation.dart';
-import 'controller/homepage_controller.dart';
-import '../../helper_files/app_colors.dart';
+import 'package:spllive/helper_files/custom_text_style.dart';
+import 'package:spllive/screens/home_screen/utils/home_screen_utils.dart';
 
-class DashBoardPage extends StatelessWidget {
+import '../../components/bottumnavigation/bottumnavigation.dart';
+import '../../helper_files/app_colors.dart';
+import 'controller/homepage_controller.dart';
+
+class DashBoardPage extends StatefulWidget {
   const DashBoardPage({super.key});
+
+  @override
+  State<DashBoardPage> createState() => _DashBoardPageState();
+}
+
+class _DashBoardPageState extends State<DashBoardPage> {
+  final controller = Get.put<HomePageController>(HomePageController());
+  final walletController = Get.put<WalletController>(WalletController());
+
+  @override
+  void initState() {
+    super.initState();
+    controller.setboolData();
+    controller.getNotificationCount();
+    controller.getNotificationsData();
+    controller.callMarketsApi();
+    controller.getUserData();
+    controller.getUserBalance();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    var controller = Get.put(HomePageController());
-    var walletController = Get.put(WalletController());
+    return Stack(
+      children: [
+        Scaffold(
+          bottomNavigationBar: Obx(
+            () => MyNavigationBar(
+              currentIndex: controller.currentIndex.value,
+              onTapBidHistory: () {
+                controller.pageWidget.value = 1;
+                controller.currentIndex.value = 1;
+                walletController.selectedIndex.value = null;
+                controller.marketBidsByUserId(lazyLoad: false);
+                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                // controller.getUserBalance();
+              },
+              onTapHome: () {
+                controller.pageWidget.value = 0;
+                controller.currentIndex.value = 0;
+                walletController.selectedIndex.value = null;
+                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                // controller.getUserBalance();
+              },
+              onTapMore: () {
+                controller.pageWidget.value = 4;
+                controller.currentIndex.value = 4;
+                walletController.selectedIndex.value = null;
+                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                // controller.getUserBalance();
+              },
+              onTapWallet: () {
+                controller.pageWidget.value = 2;
+                controller.currentIndex.value = 2;
+                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                walletController.walletBalance.refresh();
+                controller.getUserBalance();
+                walletController.walletBalance.refresh();
+              },
+              onTapPassbook: () {
+                walletController.selectedIndex.value = null;
+                controller.getPassBookData(lazyLoad: false, offset: controller.offset.value.toString());
+                controller.pageWidget.value = 3;
+                controller.currentIndex.value = 3;
+              },
+            ),
+          ),
+          backgroundColor: AppColors.white,
+          body: RefreshIndicator(
+            onRefresh: () async {
+              if (controller.pageWidget.value == 0) {
+                controller.handleRefresh();
+                walletController.walletBalance.refresh();
+              }
+            },
+            child: Obx(
+              () => controller.getDashBoardPages(
+                controller.pageWidget.value,
+                size,
+                context,
+                notifictionCount: controller.getNotifiactionCount.value.toString(),
+              ),
+            ),
+          ),
+        ),
+        Obx(
+          () => controller.getNotifiactionCount.value > 0 ? HomeScreenUtils().notificationAbout(context) : Container(),
+        )
+      ],
+    );
+  }
 
-    // var spaceBeetween = const SizedBox(height: 10);
-
-    return Scaffold(
-      // appBar: Obx(() => ),
-      bottomNavigationBar: Obx(() => MyNavigationBar(
-          currentIndex: controller.currentIndex.value,
-          onTapBidHistory: () {
-            controller.pageWidget.value = 1;
-            controller.currentIndex.value = 1;
-            //  appPosition = controller.pageWidget.value;
-          },
-          onTapHome: () {
-            controller.pageWidget.value = 0;
-            //   appPosition = controller.pageWidget.value;
-            controller.currentIndex.value = 0;
-          },
-          onTapMore: () {
-            controller.pageWidget.value = 3;
-            //    appPosition = controller.pageWidget.value;
-            controller.currentIndex.value = 3;
-          },
-          onTapWallet: () {
-            controller.pageWidget.value = 2;
-            controller.currentIndex.value = 2;
-            //   appPosition = controller.pageWidget.value;
-          })),
-      backgroundColor: AppColors.white,
-      body: Obx(() => controller.getDashBoardPages(controller.pageWidget.value,
-          size, context, walletController.walletBalance.value ?? "")),
-      floatingActionButton: AppUtils().flottingActionButton(
-        onTap: () {
-          launchUrl(
-            Uri.parse("https://wa.me/+917769826748/?text=hi"),
-          );
-        },
+  Padding onExitAlert(BuildContext context, {required Function() onExit, required Function() onCancel}) {
+    return Padding(
+      padding: EdgeInsets.all(20.0),
+      child: AlertDialog(
+        title: Text(
+          'Exit App',
+          style: CustomTextStyle.textRobotoSansBold,
+        ),
+        content: Text('Are you sure you want to exit the app?', style: CustomTextStyle.textRobotoSansMedium),
+        actions: [
+          TextButton(
+            onPressed: onCancel,
+            child: Text(
+              'Cancel',
+              style: CustomTextStyle.textRobotoSansBold.copyWith(
+                color: AppColors.appbarColor,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onExit,
+            child: Text(
+              'Exit',
+              style: CustomTextStyle.textRobotoSansBold.copyWith(
+                color: AppColors.redColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-// HomeScreenUtils().gridColumnForStarLine()

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "781388059520",
+    "project_id": "spllive07-31bae",
+    "storage_bucket": "spllive07-31bae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781388059520:android:a814a40ac410c6e2846765",
+        "android_client_info": {
+          "package_name": "com.example.spllive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "781388059520-u2of0li0201j8md1e9ngbfngt83o5feg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp23410a6qCzOSUvO1EDJAda80DItJe9Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "781388059520-u2of0li0201j8md1e9ngbfngt83o5feg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:spllive/helper_files/app_colors.dart';
 
-import '../../../components/edit_text_field_with_roundedcorner.dart';
 import '../../../components/simple_button_with_corner.dart';
 import '../../../helper_files/custom_text_style.dart';
 import '../../../helper_files/dimentions.dart';
@@ -21,54 +21,59 @@ class GiveFeedbackPage extends StatelessWidget {
       appBar: AppUtils().simpleAppbar(
         appBarTitle: "GIVEFEEDBACK".tr,
       ),
-      // customAppBar(title: "GIVEFEEDBACK".tr, onTapOfBack: () => Get.back()),
-      body: SafeArea(
-        child: Expanded(
-          child: Padding(
+      body: Column(
+        children: [
+          Padding(
             padding: const EdgeInsets.all(15.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "FEEDBACK".tr,
-                  style: CustomTextStyle.textPTsansMedium.copyWith(
-                      fontWeight: FontWeight.w500, fontSize: Dimensions.h14),
+                  style:
+                      CustomTextStyle.textRobotoMedium.copyWith(fontWeight: FontWeight.w400, fontSize: Dimensions.h14),
                 ),
-                SizedBox(
-                  height: Dimensions.h10,
-                ),
+                SizedBox(height: Dimensions.h10),
                 RoundedCornerEditText2(
-                    isEnabled: true,
-                    controller: controller.feedbackController,
-                    maxLines: 10,
-                    minLines: 10,
-                    hintText: "",
-                    keyboardType: TextInputType.multiline),
-                const SizedBox(
-                  height: 20,
+                  isEnabled: true,
+                  controller: controller.feedbackController,
+                  maxLines: 10,
+                  minLines: 10,
+                  hintText: "",
+                  keyboardType: TextInputType.multiline,
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: Dimensions.w80),
-                  child: RoundedCornerButton(
-                    height: Dimensions.h30,
-                    width: Dimensions.w130,
-                    letterSpacing: 0,
-                    color: AppColors.appbarColor,
-                    fontSize: Dimensions.h16,
-                    fontWeight: FontWeight.bold,
-                    text: "SUBMIT".tr,
-                    textStyle: CustomTextStyle.textPTsansMedium,
-                    borderRadius: Dimensions.r50,
-                    borderColor: AppColors.appbarColor,
-                    borderWidth: 1,
-                    fontColor: AppColors.white,
-                    onTap: () => controller.addFeedbackApi(),
-                  ),
+                const SizedBox(height: 20),
+                Center(
+                  child: controller.isGiveFeedback == false
+                      ? RoundedCornerButton(
+                          height: Dimensions.h30,
+                          width: Dimensions.w130,
+                          letterSpacing: 0,
+                          color: AppColors.appbarColor,
+                          fontSize: Dimensions.h14,
+                          fontWeight: FontWeight.bold,
+                          text: "SUBMIT".tr,
+                          textStyle: CustomTextStyle.textRobotoMedium,
+                          borderRadius: Dimensions.r5,
+                          borderColor: AppColors.appbarColor,
+                          borderWidth: 1,
+                          fontColor: AppColors.white,
+                          onTap: () {
+                            if (controller.feedbackController.text.trim().isNotEmpty) {
+                              controller.addFeedbackApi(5);
+                            } else {
+                              AppUtils.showErrorSnackBar(bodyText: "You can't submit empty Feedback");
+                            }
+                          },
+                        )
+                      : CircularProgressIndicator(
+                          color: AppColors.appBlueColor,
+                        ),
                 ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -104,16 +109,18 @@ class RoundedCornerEditText2 extends StatelessWidget {
       controller: controller,
       validator: (value) {
         validateValue!(false, value.toString());
+        return null;
       },
       maxLength: maxLength,
       maxLines: maxLines,
       minLines: minLines,
       keyboardType: keyboardType,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'\s+'), replacementString: " "),
+      ],
       cursorColor: AppColors.appbarColor,
-      style: CustomTextStyle.textPTsansMedium.copyWith(
-          color: AppColors.black,
-          fontWeight: FontWeight.normal,
-          fontSize: Dimensions.h16),
+      style: CustomTextStyle.textPTsansMedium
+          .copyWith(color: AppColors.black, fontWeight: FontWeight.normal, fontSize: Dimensions.h16),
       decoration: InputDecoration(
         contentPadding: EdgeInsets.all(Dimensions.h10),
         focusColor: AppColors.black,

@@ -4,13 +4,27 @@ class JsonFileModel {
   List<ThreePana>? singlePana;
   List<ThreePana>? doublePana;
   List<String>? triplePana;
-
-  JsonFileModel(
-      {this.singleAnk,
-        this.jodi,
-        this.singlePana,
-        this.doublePana,
-        this.triplePana});
+  List<String>? allThreePana;
+  List<String>? allDoublePana;
+  List<String>? allSinglePana;
+  Map<String, List<List<String>>>? panelGroupChart;
+  Map<String, List<String>>? spdptp;
+  Map<String, dynamic>? spdptpChart;
+  List<String>? groupJodi;
+  JsonFileModel({
+    this.singleAnk,
+    this.jodi,
+    this.singlePana,
+    this.doublePana,
+    this.triplePana,
+    this.allDoublePana,
+    this.allSinglePana,
+    this.allThreePana,
+    this.panelGroupChart,
+    this.spdptp,
+    this.spdptpChart,
+    this.groupJodi,
+  });
 
   JsonFileModel.fromJson(Map<String, dynamic> json) {
     singleAnk = json['single_digit'].cast<String>();
@@ -28,10 +42,44 @@ class JsonFileModel {
       });
     }
     triplePana = json['triple_pana'].cast<String>();
+    allSinglePana = json['all_single_pana'].cast<String>();
+    allDoublePana = json['all_double_pana'].cast<String>();
+    allThreePana = json['all_three_pana'].cast<String>();
+    if (json['panelGroupChart'] != null) {
+      panelGroupChart = {};
+      (json['panelGroupChart'] as Map<String, dynamic>).forEach((key, value) {
+        panelGroupChart![key] = List<List<String>>.from((value as List)
+            .map((e) => List<String>.from(e.map((x) => x.toString()))));
+      });
+    } else {
+      panelGroupChart = {};
+    }
+    if (json['spdptp'] != null) {
+      spdptp = {};
+      (json['spdptp'] as Map<String, dynamic>).forEach((key, value) {
+        spdptp![key] = List<String>.from(value.map((x) => x.toString()));
+      });
+    }
+    if (json['SPDPTPChart'] != null) {
+      spdptpChart = {};
+      (json['SPDPTPChart'] as Map<String, dynamic>).forEach((key, value) {
+        spdptpChart![key] = {
+          "SP": List<String>.from(value["SP"].map((x) => x.toString())),
+          "DP": List<String>.from(value["DP"].map((x) => x.toString())),
+          "TP": List<String>.from(value["TP"].map((x) => x.toString())),
+        };
+      });
+    }
+    if (json['groupJodi'] != null) {
+      groupJodi = List<String>.from(json['groupJodi'].map((v) => v.toString()))
+          .cast<String>();
+    } else {
+      groupJodi = null; // Handle the case when 'groupJodi' is null in the JSON
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['single_digit'] = singleAnk;
     data['jodi_digit'] = jodi;
     if (singlePana != null) {
@@ -41,6 +89,12 @@ class JsonFileModel {
       data['double_pana'] = doublePana!.map((v) => v.toJson()).toList();
     }
     data['triple_pana'] = triplePana;
+    data['panelGroupChart'] = panelGroupChart; // Convert panelGroupChart to map
+    data['spdptp'] = spdptp;
+    if (spdptpChart != null) {
+      data['SPDPTPChart'] = spdptpChart;
+    }
+    data['groupJodi'] = groupJodi;
     return data;
   }
 }
@@ -57,18 +111,18 @@ class ThreePana {
   List<String>? l8;
   List<String>? l9;
 
-
-  ThreePana(
-      {this.l0,
-        this.l1,
-        this.l2,
-        this.l3,
-        this.l4,
-        this.l5,
-        this.l6,
-        this.l7,
-        this.l8,
-        this.l9,});
+  ThreePana({
+    this.l0,
+    this.l1,
+    this.l2,
+    this.l3,
+    this.l4,
+    this.l5,
+    this.l6,
+    this.l7,
+    this.l8,
+    this.l9,
+  });
 
   ThreePana.fromJson(Map<String, dynamic> json) {
     l0 = json['0'].cast<String>();
@@ -84,7 +138,7 @@ class ThreePana {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['0'] = l0;
     data['1'] = l1;
     data['2'] = l2;

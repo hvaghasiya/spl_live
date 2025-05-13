@@ -57,4 +57,22 @@ class AppRoutName {
 
   /// CheckWithDrawal History Page
   static String checkWithDrawalPage = "/check_withdrawal_page";
+
+  /// NormalMarketPage
+  static String normalMarketPage = "/normal_market_page";
+
+  /// NewGamemodePage
+  static String newGameModePage = "/new_gamemode_page";
+
+  /// oddEvenGamePage
+  static String newOddEvenPage = "/new_game_page_odd_even";
+
+  /// starlineBidPage
+  static String starlineBidpage = "/starline_bid_page";
+
+  /// starlineBidPage
+  static String newStarlineGames = "/new_starline_games";
+
+  /// newBidHistorypage
+  static String newBidHistorypage = "/bid_history_page_new";
 }
