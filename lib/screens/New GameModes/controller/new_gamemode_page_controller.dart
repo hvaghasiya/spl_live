@@ -267,6 +267,7 @@ class NewGamemodePageController extends GetxController {
       String numStr = num.toString();
       print(numStr);
       print("kakakakakakka");
+      print(spdpMotor.length);
       if (inputDigits[0] == inputDigits[1]) {
         print("fdsjfdkfjdhs${inputDigits}");
         print("fsdjfhgsdjfsgdf");
@@ -287,31 +288,6 @@ class NewGamemodePageController extends GetxController {
         }
       }
       return inputDigits.every((digit) => numStr.contains(digit.toString()));
-      // if (inputDigits[0] == 0) {
-      //   var start = inputDigits[0].toString();
-      //   print(start);
-      //   print("fdskjfghsdjkfhkfsdjkfh");
-      //   inputDigits.insert(0, 0);
-      //   // bool value = inputDigits.every((digit) {
-      //   //   return numStr.contains(digit.toString());
-      //   // });
-      //   // print("fsdhfgsdfjshfsk");
-      //   // print(value);
-      //   return inputDigits.every((digit) => numStr.contains(digit.toString())) && num.toString().startsWith(start);
-      // } else {
-      //   return inputDigits.every((digit) => numStr.contains(digit.toString())) ;
-      // }
-
-      // if (inputNumber == 0) {
-      //   return numStr.contains("00");
-      // }
-      /*else if (inputDigits[0] == inputDigits[1]) {
-        return numStr.contains(inputNumber.toString());
-      }*/
-      // else {
-      // return numStr.contains(inputNumber.toString());
-      // return inputDigits.every((digit) => numStr.contains(digit.toString()));
-      // }
     }
 
     print("fdkjfdhsfkjdhfksjdhfkjdh");

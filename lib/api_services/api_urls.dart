@@ -7,7 +7,7 @@ class ApiUtils {
   // StagingURl
   // static String baseURL = "http://15.207.71.94:9867";
   // static String baseURL = "http://3.110.8.245:9867";
-  // static String baseURL = "http://192.168.29.49:8080";
+  // static String baseURL = "http://192.168.1.49:8080";
 
   // local url
   // static String baseURL = "http://192.168.29.201:8659";
