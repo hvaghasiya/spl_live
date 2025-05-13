@@ -230,8 +230,7 @@ class _StarlineDailyMarketDataState extends State<StarlineDailyMarketData> {
                                     onTap: () {
                                       if (starlineCon.starLineMarketList[i].isBidOpen ?? false) {
                                         if (starlineCon.starLineMarketList[i].isBidOpen ?? false) {
-                                          Get.toNamed(AppRoutName.starLineGameModesPage,
-                                              arguments: starlineCon.starLineMarketList[i]);
+                                          Get.toNamed(AppRoutName.starLineGameModesPage, arguments: starlineCon.starLineMarketList[i]);
                                         } else {
                                           AppUtils.showErrorSnackBar(bodyText: "Bidding is Closed!!!!");
                                         }
@@ -272,8 +271,7 @@ class _StarlineDailyMarketDataState extends State<StarlineDailyMarketData> {
                                           Container(
                                             height: Dimensions.h25,
                                             width: Dimensions.w80,
-                                            decoration: BoxDecoration(
-                                                color: AppColors.blueButton, borderRadius: BorderRadius.circular(25)),
+                                            decoration: BoxDecoration(color: AppColors.blueButton, borderRadius: BorderRadius.circular(25)),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
@@ -311,14 +309,12 @@ class _StarlineDailyMarketDataState extends State<StarlineDailyMarketData> {
                                             ),
                                             child: Center(
                                               child: Text(
-                                                starlineCon.starLineMarketList[i].isBidOpen ?? false
-                                                    ? "Bidding is Open"
-                                                    : "Bidding is Closed",
+                                                starlineCon.starLineMarketList[i].isBidOpen ?? false ? "Bidding is Open" : "Bidding is Closed",
                                                 style: starlineCon.starLineMarketList[i].isBidOpen ?? false
-                                                    ? CustomTextStyle.textRobotoMedium.copyWith(
-                                                        color: AppColors.greenShade, fontWeight: FontWeight.w400)
-                                                    : CustomTextStyle.textRobotoMedium.copyWith(
-                                                        color: AppColors.redColor, fontWeight: FontWeight.w400),
+                                                    ? CustomTextStyle.textRobotoMedium
+                                                        .copyWith(color: AppColors.greenShade, fontWeight: FontWeight.w400)
+                                                    : CustomTextStyle.textRobotoMedium
+                                                        .copyWith(color: AppColors.redColor, fontWeight: FontWeight.w400),
                                               ),
                                             ),
                                           ),

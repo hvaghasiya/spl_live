@@ -97,9 +97,10 @@ class MPINPageController extends GetxController {
       if (value['status']) {
         Get.toNamed(AppRoutName.verifyOTPPage);
       } else {
-        AppUtils.showErrorSnackBar(
-          bodyText: value['message'] ?? "",
-        );
+        // AppUtils.showErrorSnackBar(
+        //   bodyText: value['message'] ?? "",
+        // );
+        AppUtils().accountFlowDialog(msg: value['message']);
       }
     });
   }

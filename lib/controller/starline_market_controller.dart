@@ -29,8 +29,7 @@ class StarlineMarketController extends GetxController {
   DateTime startEndDate = DateTime.now();
   DateTime bidHistoryDate = DateTime.now();
   String? starlineMarketDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  TextEditingController dateInputForResultHistory =
-      TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
+  TextEditingController dateInputForResultHistory = TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
 
   RxList<MarketHistoryList> marketHistoryListt = <MarketHistoryList>[].obs;
   RxBool isMarketResults = false.obs;
@@ -47,10 +46,8 @@ class StarlineMarketController extends GetxController {
         });
         print("filterMarketList ${filterMarketList.length}");
         if (starLineMarketList.isNotEmpty) {
-          var biddingOpenMarketList =
-              starLineMarketList.where((element) => element.isBidOpen == true && element.isBlocked == false).toList();
-          var biddingClosedMarketList =
-              starLineMarketList.where((element) => element.isBidOpen == false && element.isBlocked == false).toList();
+          var biddingOpenMarketList = starLineMarketList.where((element) => element.isBidOpen == true && element.isBlocked == false).toList();
+          var biddingClosedMarketList = starLineMarketList.where((element) => element.isBidOpen == false && element.isBlocked == false).toList();
           var tempFinalMarketList = <StarlineMarketData>[];
           biddingOpenMarketList.sort((a, b) {
             DateTime dateTimeA = DateFormat('hh:mm a').parse(a.time ?? "00:00 AM");
@@ -77,8 +74,7 @@ class StarlineMarketController extends GetxController {
     });
   }
 
-  TextEditingController dateResultHistory =
-      TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
+  TextEditingController dateResultHistory = TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
 
   getResultHistory(String? startDate) async {
     ApiService()
@@ -220,6 +216,8 @@ class StarlineMarketController extends GetxController {
     try {
       bannerLoad.value = true;
       ApiService().getStarlineBanner().then((value) async {
+        print("fdskfjghsdkfdfd");
+        print(value);
         if (value['status']) {
           bannerLoad.value = false;
           var bannerlist = await (value['data'] as List)

@@ -2,7 +2,7 @@ class ApiUtils {
   // Spl Production
   static String baseURL = "https://vishnulive.in:9870";
   // local url
-  // static String baseURL = "http://192.168.29.49:8080";
+  // static String baseURL = "https://cdf7-122-176-221-50.ngrok-free.app";
 
   // StagingURl
   // static String baseURL = "http://15.207.71.94:9867";
@@ -84,9 +84,10 @@ class ApiUtils {
   static String putWalletTransactionStatus = "$baseURL/payment/ReadPaymentNotification";
   static String getAllPackages = "$baseURL/payment/getAllPackages";
   static String checkUserName = "$baseURL/user/checkUsername";
-  static String getApk = "$baseURL/public/apk/spl_live.apk";
+  // static String getApk = "$baseURL/public/apk/spl_live.apk";
+  static String getApk = "https://hrms.pragetx.com/spl_live.apk";
   // static String getApk =
-  //     "https://fs4.fastupload.io/39f07e1a206e3740/app-release.apk?download_token=a904bf4dc9b637464da1d021b9a9f3d7d24c07827ecff34bccf86740fba2746d";
+  //     "https://drive.usercontent.google.com/download?id=1xFj9cvUzAdS1K9SBC7S44vQkNYzyEAde&export=download&authuser=0&confirm=t&uuid=44694775-628b-4224-86fe-045bdb30e880&at=AEz70l7pKVt0v50p4Jdr9XJjoaNM:1740393428256";
   static String getTickets = "$baseURL/wallet/addFund";
   static String getBankHistory = "$baseURL/bank/userBankHistory";
   static String getWithdrawal = "$baseURL/withdraw/dailyWithdrawalInfo";
