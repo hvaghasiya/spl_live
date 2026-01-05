@@ -152,7 +152,8 @@ class _MyAppState extends State<MyApp> {
                 theme: ThemeData(
                   primarySwatch: Colors.blue,
                   scaffoldBackgroundColor: AppColors.white,
-                  dialogTheme: DialogTheme(surfaceTintColor: AppColors.white),
+
+                  // dialogTheme: DialogTheme(surfaceTintColor: AppColors.white),
                   appBarTheme: AppBarTheme(
                     iconTheme: IconThemeData(color: AppColors.white),
                     scrolledUnderElevation: 0,

@@ -21,62 +21,25 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
     }
-    flavorDimensions "abi"
-//    splits {
-//        abi {
-//            enable true
-//            reset() // Clear default 'all' ABIs
-//            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64','universalApk' // Specify desired ABIs
-//            universalApk true
-//        }
-//    }
-    splits {
-        abi {
-            enable true
-            universalApk true // This line creates the universal APK
-        }
-    }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.spllive"
-        minSdk = 23
+        minSdkVersion = flutter.minSdkVersion
         targetSdk = 35
         versionCode = 1001
         versionName = flutter.versionName
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
     }
-//    productFlavors {
-//
-//        arm {
-//            dimension "abi"
-//            versionCode 1100 // Version code for 'armeabi-v7a' split
-//
-//        }
-//
-//        arm64 {
-//            dimension "abi"
-//            versionCode 1110 // Version code for 'arm64-v8a' split
-//
-//        }
-//
-//        x86 {
-//            dimension "abi"
-//            versionCode 1120 // Version code for 'x86' split
-//
-//        }
-//
-//        x86_64 {
-//            dimension "abi"
-//            versionCode 1130 // Version code for 'x86_64' split
-//
-//        }
-//
-//    }
+
     signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
@@ -85,12 +48,10 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.release
-//            minifyEnabled true
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -98,7 +59,13 @@ android {
     }
 }
 
+
 flutter {
     source = "../.."
 }
+
+dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
+}
+
 
