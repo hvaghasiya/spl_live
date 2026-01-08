@@ -95,7 +95,7 @@
 class NormalMarketBidHistoryResponseModel {
   final String? message;
   final bool? status;
-  final Data? data;
+  final dynamic data;
 
   NormalMarketBidHistoryResponseModel({
     this.message,
@@ -135,7 +135,7 @@ class ResultArr {
   final String? bidType;
   final String? bidNo;
   final int? coins;
-  final int? balance;
+  final dynamic balance;
   final String? bidTime;
   final String? gameMode;
   final String? marketName;
@@ -145,28 +145,29 @@ class ResultArr {
   final String? transactionType;
   final String? remarks;
   final bool? isResultDeclared;
+  final String? requestId;
 
-  ResultArr({
-    this.bidType,
-    this.bidNo,
-    this.coins,
-    this.balance,
-    this.bidTime,
-    this.gameMode,
-    this.marketName,
-    this.openTime,
-    this.closeTime,
-    this.isWin,
-    this.transactionType,
-    this.remarks,
-    this.isResultDeclared,
-  });
+  ResultArr(
+      {this.bidType,
+      this.bidNo,
+      this.coins,
+      this.balance,
+      this.bidTime,
+      this.gameMode,
+      this.marketName,
+      this.openTime,
+      this.closeTime,
+      this.isWin,
+      this.transactionType,
+      this.remarks,
+      this.isResultDeclared,
+      this.requestId});
 
   ResultArr.fromJson(Map<String, dynamic> json)
       : bidType = json['BidType'] as String?,
         bidNo = json['BidNo'] as String?,
         coins = json['Coins'] as int?,
-        balance = json['Balance'] as int?,
+        balance = json['Balance'] as dynamic,
         bidTime = json['BidTime'] as String?,
         gameMode = json['GameMode'] as String?,
         marketName = json['MarketName'] as String?,
@@ -175,7 +176,8 @@ class ResultArr {
         isWin = json['IsWin'] as bool?,
         transactionType = json['TransactionType'] as String?,
         remarks = json['Remarks'] as String?,
-        isResultDeclared = json['IsResultDeclared'] as bool?;
+        isResultDeclared = json['IsResultDeclared'] as bool?,
+        requestId = json['RequestId'] as String?;
 
   Map<String, dynamic> toJson() => {
         'BidType': bidType,
@@ -190,6 +192,7 @@ class ResultArr {
         'IsWin': isWin,
         'TransactionType': transactionType,
         'Remarks': remarks,
-        'IsResultDeclared': isResultDeclared
+        'IsResultDeclared': isResultDeclared,
+        'RequestId': requestId
       };
 }

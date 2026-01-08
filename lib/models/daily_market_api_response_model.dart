@@ -29,6 +29,7 @@ class DailyMarketApiResponseModel {
 
 class MarketData {
   int? id;
+  int? marketId;
   String? market;
   String? openTime;
   String? closeTime;
@@ -41,25 +42,32 @@ class MarketData {
   bool? isCloseResultDeclared;
   bool? isCoinDistributedForOpen;
   bool? isCoinDistributedForClose;
+  bool? isActive;
+  bool? isBlocked;
 
-  MarketData(
-      {this.id,
-        this.market,
-        this.openTime,
-        this.closeTime,
-        this.date,
-        this.openResult,
-        this.closeResult,
-        this.isBidOpenForOpen,
-        this.isBidOpenForClose,
-        this.isOpenResultDeclared,
-        this.isCloseResultDeclared,
-        this.isCoinDistributedForOpen,
-        this.isCoinDistributedForClose});
+  MarketData({
+    this.id,
+    this.market,
+    this.openTime,
+    this.closeTime,
+    this.date,
+    this.openResult,
+    this.closeResult,
+    this.isBidOpenForOpen,
+    this.isBidOpenForClose,
+    this.isOpenResultDeclared,
+    this.isCloseResultDeclared,
+    this.isCoinDistributedForOpen,
+    this.isCoinDistributedForClose,
+    this.isActive,
+    this.isBlocked,
+    this.marketId,
+  });
 
   MarketData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     market = json['Market'];
+    marketId = json['MarketId'];
     openTime = json['OpenTime'];
     closeTime = json['CloseTime'];
     date = json['Date'];
@@ -71,12 +79,15 @@ class MarketData {
     isCloseResultDeclared = json['IsCloseResultDeclared'];
     isCoinDistributedForOpen = json['IsCoinDistributedForOpen'];
     isCoinDistributedForClose = json['IsCoinDistributedForClose'];
+    isActive = json['IsActive'];
+    isBlocked = json['IsBlocked'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['Market'] = market;
+    data['MarketId'] = marketId;
     data['OpenTime'] = openTime;
     data['CloseTime'] = closeTime;
     data['Date'] = date;
@@ -88,6 +99,8 @@ class MarketData {
     data['IsCloseResultDeclared'] = isCloseResultDeclared;
     data['IsCoinDistributedForOpen'] = isCoinDistributedForOpen;
     data['IsCoinDistributedForClose'] = isCoinDistributedForClose;
+    data['IsActive'] = isActive;
+    data['isBlocked'] = isBlocked;
     return data;
   }
 }

@@ -34,13 +34,13 @@ class Data {
 
   Data(
       {this.id,
-        this.userId,
-        this.feedback,
-        this.rating,
-        this.isActive,
-        this.createdAt,
-        this.updatedAt,
-        this.user});
+      this.userId,
+      this.feedback,
+      this.rating,
+      this.isActive,
+      this.createdAt,
+      this.updatedAt,
+      this.user});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -72,18 +72,21 @@ class Data {
 class User {
   String? fullName;
   String? userName;
+  dynamic appRating;
 
   User({this.fullName, this.userName});
 
   User.fromJson(Map<String, dynamic> json) {
     fullName = json['FullName'];
     userName = json['UserName'];
+    appRating = json['AppRating'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['FullName'] = fullName;
     data['UserName'] = userName;
+    data['AppRating'] = appRating;
     return data;
   }
 }

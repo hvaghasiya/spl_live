@@ -1,0 +1,2 @@
+/Users/pragetx/Desktop/ankitproject/spl_livenew/android/app/.cxx/RelWithDebInfo/4b3v41a2/x86_64/CMakeFiles/edit_cache.dir
+/Users/pragetx/Desktop/ankitproject/spl_livenew/android/app/.cxx/RelWithDebInfo/4b3v41a2/x86_64/CMakeFiles/rebuild_cache.dir

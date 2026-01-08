@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:spllive/helper_files/ui_utils.dart';
-import 'package:spllive/routes/app_routes_name.dart';
-
 import '../../../api_services/api_service.dart';
+import '../../../components/DeviceInfo/device_info.dart';
+import '../../../helper_files/ui_utils.dart';
+import '../../../routes/app_routes_name.dart';
 
 class SignUpPageController extends GetxController {
   var mobileNumberController = TextEditingController();
@@ -20,50 +20,34 @@ class SignUpPageController extends GetxController {
 
   void callSignUpApi() async {
     ApiService().signUpAPI(await signUpBody()).then((value) async {
-      if (kDebugMode) {
-        print("SignUP Api Response :- $value");
-      }
       if (value['data'] != null && value['status']) {
-        AppUtils.showSuccessSnackBar(
-            bodyText: value['message'] ?? "", headerText: "SUCCESSMESSAGE".tr);
+        // AppUtils.showSuccessSnackBar(bodyText: value['message'] ?? "", headerText: "SUCCESSMESSAGE".tr);
         Get.toNamed(AppRoutName.verifyOTPPage, arguments: {
           "countryCode": countryCode.value,
           "phoneNumber": mobileNumberController.text,
         });
       } else {
-        AppUtils.showErrorSnackBar(
-          bodyText: value['message'] ?? "",
-        );
+        // AppUtils.showErrorSnackBar(
+        //   bodyText: value['message'] ?? "",
+        // );
+        AppUtils().accountFlowDialog(msg: value['message']);
       }
     });
   }
 
   Future<Map<String, dynamic>> signUpBody() async {
-    // DeviceInformationModel deviceInfo = await DeviceInfo().initPlatformState();
     final signUpBody = {
-      // "userName": userNameController.text,
-      // "fullName": nameController.text,
-      // "countryCode": countryCode.value,
-      // "phoneNumber": mobileNumberController.text,
-      // "whatsappNumber": whatsappNumberController.text,
-      // "password": passwordController.text,
-      // "deviceId": deviceInfo.deviceId,
       // "appVersion": deviceInfo.appVersion,
       // "brandName": deviceInfo.brandName,
       // "model": deviceInfo.model,
-      // "os": deviceInfo.deviceOs,
+      // "deviceOs": deviceInfo.deviceOs,
       // "manufacturer": deviceInfo.manufacturer,
       // "osVersion": deviceInfo.osVersion,
-
-      //
       "countryCode": countryCode.value,
       "phoneNumber": mobileNumberController.text,
-      // "deviceId": deviceInfo.deviceId,
-      "deviceId": mobileNumberController.text,
+      "deviceId": DeviceInfo.deviceId,
     };
-    if (kDebugMode) {
-      print(signUpBody.toString());
-    }
+    if (kDebugMode) {}
     return signUpBody;
   }
 
@@ -71,13 +55,11 @@ class SignUpPageController extends GetxController {
     FocusManager.instance.primaryFocus?.unfocus();
     Get.closeCurrentSnackbar();
     if (mobileNumberController.text.isEmpty) {
-      AppUtils.showErrorSnackBar(
-        bodyText: "ENTERMOBILENUMBER".tr,
-      );
+      AppUtils().accountFlowDialog(msg: "ENTERMOBILENUMBER".tr);
+      // AppUtils.showErrorSnackBar(bodyText: "ENTERMOBILENUMBER".tr);
     } else if (mobileNumberController.text.toString().length < 10) {
-      AppUtils.showErrorSnackBar(
-        bodyText: "ENTERVALIDNUMBER".tr,
-      );
+      // AppUtils.showErrorSnackBar(bodyText: "ENTERVALIDNUMBER".tr);
+      AppUtils().accountFlowDialog(msg: "ENTERVALIDNUMBER".tr);
     } else {
       callSignUpApi();
     }

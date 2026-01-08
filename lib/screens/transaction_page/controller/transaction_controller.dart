@@ -1,28 +1,34 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+
+import '../../../api_services/api_service.dart';
 import '../../../helper_files/constant_variables.dart';
-import '../../../models/transaction_history_api_response_model.dart';
-import '../../Local Storage.dart';
+import '../../../helper_files/ui_utils.dart';
+import '../../../models/commun_models/user_details_model.dart';
+import '../../../models/payment_transaction_model.dart';
+
 
 class TransactionHistoryPageController extends GetxController {
-  var transactionModel = TransactionHistoryApiResponseModel();
-  var transactionList = <TransactionData>[].obs;
-  // UserData userDetailsModel = UserData();
-  int offset = 1;
+  Rx<PaymentTransactionModel> transactionModel = PaymentTransactionModel().obs;
+  // RxList<ResultArr> transactionList = <ResultArr>[].obs;
+  UserDetailsModel userDetailsModel = UserDetailsModel();
+  int offset = 0;
   // Future<void> onSwipeRefresh() async {
   //   if (userDetailsModel.id != null) {
   //     getTransactionHistory(offset: offset);
   //   } else {
-  //     UIUtils.showErrorSnackBar(
+  //     AppUtils.showErrorSnackBar(
   //       bodyText: "SOMETHINGWENTWRONG".tr,
   //     );
   //   }
   // }
 
-  Future<void> fetchUserData() async {
-    var userData = await LocalStorage.read(ConstantsVariables.userData);
-    // userDetailsModel = UserData.fromJson(userData);
-    // if (userDetailsModel.id != null) {
-    //   getTransactionHistory(offset: offset);
+  fetchUserData() {
+    final userData = GetStorage().read(ConstantsVariables.userData);
+    userDetailsModel = UserDetailsModel.fromJson(userData);
+    if (userDetailsModel.id != null) {
+      getTransactionHistory();
+    }
     // } else {
     //   AppUtils.showErrorSnackBar(
     //     bodyText: "SOMETHINGWENTWRONG".tr,
@@ -30,23 +36,23 @@ class TransactionHistoryPageController extends GetxController {
     // }
   }
 
-  // void getTransactionHistory({required int offset}) async {
-  //   ApiService()
-  //       .getTransactionHistoryById(userId: 1, offset: offset)
-  //       // userId: userDetailsModel.id ?? 0, offset: offset)
-  //       .then((value) async {
-  //     print("Get transaction history Api Response :- $value");
-  //     if (value['status']) {
-  //       transactionModel = TransactionHistoryApiResponseModel.fromJson(value);
-  //       if (transactionModel.data != null &&
-  //           transactionModel.data!.isNotEmpty) {
-  //         transactionList.value = transactionModel.data!;
-  //       } else {}
-  //     } else {
-  //       AppUtils.showErrorSnackBar(
-  //         bodyText: value['message'] ?? "",
-  //       );
-  //     }
-  //   });
-  // }
+  void getTransactionHistory() async {
+    ApiService()
+        .getTransactionHistoryById(
+      userId: "${userDetailsModel.id ?? 0}",
+      offset: "$offset",
+      limit: "5000",
+    )
+        .then(
+      (value) async {
+        if (value['status']) {
+          transactionModel.value = PaymentTransactionModel.fromJson(value);
+        } else {
+          AppUtils.showErrorSnackBar(
+            bodyText: value['message'] ?? "",
+          );
+        }
+      },
+    );
+  }
 }

@@ -1,23 +1,13 @@
 import 'package:get/get.dart';
-import 'package:spllive/screens/More%20Details%20Screens/About%20Page/about_page.dart';
-import 'package:spllive/screens/More%20Details%20Screens/Change%20Mpin/binding/change_mpin_page_binding.dart';
-import 'package:spllive/screens/More%20Details%20Screens/Notification%20Page/binding/notification_details_page_binding.dart';
-import 'package:spllive/screens/More%20Details%20Screens/myProfile/binding/myprofile_page_binding.dart';
-import 'package:spllive/screens/More%20Details%20Screens/myProfile/myprofile_page.dart';
-import 'package:spllive/screens/Sangam%20Page/binding/snagam_page_binding.dart';
-import 'package:spllive/screens/Sangam%20Page/controller/sangam_page_controller.dart';
-import 'package:spllive/screens/game_pages/game_pages.dart';
-import 'package:spllive/screens/gamemode_pages/gamemode_page.dart';
-import 'package:spllive/screens/sign_in_screen/bindings/sign_in_screen_binding.dart';
-import 'package:spllive/screens/sign_up_screen/bindings/sing_up_screen_bindings.dart';
-import 'package:spllive/screens/sign_up_screen/sign_up_screen.dart';
-import 'package:spllive/screens/slash_screen/bindings/splash_screen_bindings.dart';
-import 'package:spllive/screens/slash_screen/splash_screen.dart';
+
+
 import '../screens/Forgot Password/binding/forgot_password_page_binding.dart';
 import '../screens/Forgot Password/forgot_password_page.dart';
 import '../screens/MPIN Page/binding/mpin_page_binding.dart';
 import '../screens/MPIN Page/mpin_page_view.dart';
+import '../screens/More Details Screens/About Page/about_page.dart';
 import '../screens/More Details Screens/About Page/binding/about_page_biding.dart';
+import '../screens/More Details Screens/Change Mpin/binding/change_mpin_page_binding.dart';
 import '../screens/More Details Screens/Change Mpin/change_mpin_page.dart';
 import '../screens/More Details Screens/Change Password/bidding/change_password_bidings.dart';
 import '../screens/More Details Screens/Change Password/change_password.dart';
@@ -31,13 +21,23 @@ import '../screens/More Details Screens/Give Feedback Page/binding/give_feedback
 import '../screens/More Details Screens/Give Feedback Page/give_feedback_page.dart';
 import '../screens/More Details Screens/My Account Page/binding/myaccount_page_bindings.dart';
 import '../screens/More Details Screens/My Account Page/myaccount_page.dart';
+import '../screens/More Details Screens/Notification Page/binding/notification_details_page_binding.dart';
 import '../screens/More Details Screens/Notification Page/notification_details.dart';
 import '../screens/More Details Screens/Starline Terms Page/binding/starline_terms_page_binding.dart';
 import '../screens/More Details Screens/Starline Terms Page/starline_terms_page.dart';
 import '../screens/More Details Screens/Withdrawal Page/binding/withdrawal_page_binding.dart';
 import '../screens/More Details Screens/Withdrawal Page/withdrawal_page.dart';
+import '../screens/More Details Screens/myProfile/binding/myprofile_page_binding.dart';
+import '../screens/More Details Screens/myProfile/myprofile_page.dart';
+import '../screens/New GameModes/binding/new_gamemode_page_bindings.dart';
+import '../screens/New GameModes/new_gamemodes_page.dart';
+import '../screens/Normal Game Pages/binding/normal_game_page_controller.dart';
+import '../screens/Normal Game Pages/normal_game_pages.dart';
+import '../screens/Notification MSG Page/bindings/notification_binding.dart';
+import '../screens/Notification MSG Page/notification.dart';
 import '../screens/Reset Password Page/binding/reset_password_binding.dart';
 import '../screens/Reset Password Page/reset_password.dart';
+import '../screens/Sangam Page/binding/snagam_page_binding.dart';
 import '../screens/Sangam Page/sangampages.dart';
 import '../screens/Select Bid Page/binding/selectbid_page_bindings.dart';
 import '../screens/Select Bid Page/selectbid_page.dart';
@@ -45,18 +45,28 @@ import '../screens/Set MPIN Page/binding/set_mpin_page_binding.dart';
 import '../screens/Set MPIN Page/set_mpin_page.dart';
 import '../screens/StarLine Game Mode Page/binding/starline_game_modes_page_binding.dart';
 import '../screens/StarLine Game Mode Page/starline_game_modes_page.dart';
+import '../screens/Starline Bid Page/bidings/starline_bids_bidings.dart';
+import '../screens/Starline Bid Page/starline_bids.dart';
 import '../screens/Starline Game Page/binding/starline_game_page_binding.dart';
 import '../screens/Starline Game Page/starline_game_page.dart';
+import '../screens/Starline New Game Page/bindings/starline_new_game_page_binding.dart';
+import '../screens/Starline New Game Page/starline_new_game_page.dart';
 import '../screens/User Details Page/binding/user_details_page_binding.dart';
 import '../screens/User Details Page/user_details_page.dart';
 import '../screens/Verify OTP Page/binding/verify_otp_binding.dart';
 import '../screens/Verify OTP Page/verify_otp.dart';
 import '../screens/game_pages/bindings/game_mode_page_binding.dart';
+import '../screens/game_pages/game_pages.dart';
 import '../screens/gamemode_pages/bindings/game_mode_page_binding.dart';
-import '../screens/home_screen/binding/home_screen_binding.dart';
-import '../screens/home_screen/home_screen.dart';
-import '../screens/notification_page/notification.dart';
+import '../screens/gamemode_pages/gamemode_page.dart';
+import '../screens/new_ui/bottom_bar_screens/bottom_bar_screen.dart';
+import '../screens/sign_in_screen/bindings/sign_in_screen_binding.dart';
 import '../screens/sign_in_screen/sign_in_screen_page.dart';
+import '../screens/sign_up_screen/bindings/sing_up_screen_bindings.dart';
+import '../screens/sign_up_screen/sign_up_screen.dart';
+import '../screens/slash_screen/bindings/splash_screen_bindings.dart';
+import '../screens/slash_screen/splash_screen.dart';
+import '../screens/transaction_page/binding/transaction_page_binding.dart';
 import '../screens/transaction_page/transaction.dart';
 import '../screens/welcome_screen/bindings/welcome_screen_bindings.dart';
 import '../screens/welcome_screen/welcome_screen.dart';
@@ -78,7 +88,7 @@ class AppRoutes {
       name: AppRoutName.walcomeScreen,
       transition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 300),
-      page: () => const WelcomeScreen(),
+      page: () => WelcomeScreen(),
       bindings: [
         WelcomeScreenBinding(),
       ],
@@ -86,40 +96,39 @@ class AppRoutes {
     GetPage(
       name: AppRoutName.dashBoardPage,
       transition: Transition.fadeIn,
+      page: () => const BottomBarScreen(),
       transitionDuration: const Duration(milliseconds: 300),
-      page: () => const DashBoardPage(),
-      bindings: [
-        HomePageBindings(),
-      ],
+      // bindings: [
+      //   HomePageBindings(),
+      // ],
     ),
     GetPage(
       name: AppRoutName.transactionPage,
       transition: Transition.fadeIn,
+      page: () => TransactionPage(),
       transitionDuration: const Duration(milliseconds: 300),
-      page: () => const TransactionPage(),
-      // bindings: [
-      //   DashBoardPage(),
-      // ],
+      bindings: [
+        TransactionPageBindings(),
+      ],
     ),
     GetPage(
       name: AppRoutName.notificationPage,
       transition: Transition.fadeIn,
+      page: () => NotificationPage(),
       transitionDuration: const Duration(milliseconds: 300),
-      page: () => const NotificationPage(),
-      // bindings: [
-      //   DashBoardPage(),
-      // ],
+      bindings: [
+        NotificationBinding(),
+      ],
     ),
     GetPage(
       name: AppRoutName.gameModePage,
       transition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 300),
       page: () => GameModePage(),
+      transitionDuration: const Duration(milliseconds: 300),
       bindings: [
         GameModepageBinding(),
       ],
     ),
-
     GetPage(
       name: AppRoutName.signInPage,
       transition: Transition.fadeIn,
@@ -247,8 +256,8 @@ class AppRoutes {
     GetPage(
       name: AppRoutName.starLineGameModesPage,
       transition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 300),
       page: () => StarLineGameModesPage(),
+      transitionDuration: const Duration(milliseconds: 300),
       bindings: [
         StarLineGameModesPageBindings(),
       ],
@@ -332,8 +341,8 @@ class AppRoutes {
     GetPage(
       name: AppRoutName.aboutPage,
       transition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 300),
       page: () => AboutUsPage(),
+      transitionDuration: const Duration(milliseconds: 300),
       bindings: [AboutUsPageBiding()],
     ),
     GetPage(
@@ -367,6 +376,41 @@ class AppRoutes {
       transitionDuration: const Duration(milliseconds: 300),
       page: () => CheckWithdrawalPage(),
       bindings: [CheckWithdrawalPageBinding()],
+    ),
+    // GetPage(
+    //   name: AppRoutName.normalMarketPage,
+    //   transition: Transition.fadeIn,
+    //
+    //   page: () => NormalMarketPage(),
+    //   bindings: [NormalMarketPageBinding()],
+    // ),
+    GetPage(
+      name: AppRoutName.newGameModePage,
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+      page: () => NewGameModePage(),
+      bindings: [NewGamemodePageBindings()],
+    ),
+    GetPage(
+      name: AppRoutName.newOddEvenPage,
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+      page: () => NormalGamePage(),
+      bindings: [NormalGamePageBindings()],
+    ),
+    GetPage(
+      name: AppRoutName.starlineBidpage,
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+      page: () => StarlineBidsPage(),
+      bindings: [StarlineBidsBidings()],
+    ),
+    GetPage(
+      name: AppRoutName.newStarlineGames,
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+      page: () => StarLineNewGamePage(),
+      bindings: [StarlineNewGamePageBinding()],
     ),
   ];
 }

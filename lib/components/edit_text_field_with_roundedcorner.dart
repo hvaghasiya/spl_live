@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:spllive/helper_files/app_colors.dart';
 
+
+import '../helper_files/app_colors.dart';
 import '../helper_files/custom_text_style.dart';
 import '../helper_files/dimentions.dart';
 
@@ -34,6 +35,7 @@ class RoundedCornerEditText extends StatelessWidget {
       controller: controller,
       validator: (value) {
         validateValue!(false, value.toString());
+        return null;
       },
       maxLength: maxLength,
       maxLines: maxLines,

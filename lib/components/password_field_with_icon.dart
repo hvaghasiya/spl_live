@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:spllive/helper_files/app_colors.dart';
 
+
+import '../helper_files/app_colors.dart';
 import '../helper_files/custom_text_style.dart';
 import '../helper_files/dimentions.dart';
 
@@ -17,17 +18,21 @@ class PasswordFieldWithIcon extends StatelessWidget {
     required this.suffixIcon,
     required this.hidePassword,
     required this.height,
+    this.focusNode,
+    this.onChanged,
   }) : super(key: key);
 
   final TextEditingController controller;
 
   String hintText;
+  FocusNode? focusNode;
   String imagePath;
   TextInputType? keyBoardType;
   Widget suffixIcon;
   Color suffixIconColor;
   bool hidePassword;
   double height;
+  Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -36,16 +41,18 @@ class PasswordFieldWithIcon extends StatelessWidget {
       child: SizedBox(
         height: height,
         child: TextFormField(
+          focusNode: focusNode,
           keyboardType: keyBoardType,
           autofocus: false,
           controller: controller,
           obscureText: !hidePassword,
           cursorColor: AppColors.black,
-          style: CustomTextStyle.textRobotoSlabMedium.copyWith(
+          style: CustomTextStyle.textRobotoSansMedium.copyWith(
             color: AppColors.black,
             fontWeight: FontWeight.normal,
             fontSize: Dimensions.h16,
           ),
+          onChanged: onChanged,
           decoration: InputDecoration(
             prefixIcon: Padding(
               padding: EdgeInsets.all(Dimensions.w12),
@@ -68,10 +75,10 @@ class PasswordFieldWithIcon extends StatelessWidget {
             enabledBorder: decoration,
             errorMaxLines: 4,
             hintText: hintText,
-            hintStyle: CustomTextStyle.textPTsansMedium.copyWith(
+            hintStyle: CustomTextStyle.textRobotoSansLight.copyWith(
               color: AppColors.grey,
               fontSize: Dimensions.h14,
-              fontWeight: FontWeight.normal,
+              // fontWeight: FontWeight.w500,
             ),
           ),
         ),

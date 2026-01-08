@@ -14,7 +14,7 @@ class StarlineTermsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:
-          AppUtils().simpleAppbar(appBarTitle: "Starline Terms & Conditions"),
+          AppUtils().simpleAppbar(appBarTitle: "STARLINETERMSANDCONDITIONS".tr),
       body: Padding(
         padding: EdgeInsets.all(Dimensions.r8),
         child: Column(
@@ -71,23 +71,33 @@ class StarlineTermsPage extends StatelessWidget {
 
   Widget starlineGameWinRatio() {
     return Obx(
-      () => Expanded(
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: controller.starlineMarketModel.value.data?.length,
-          itemBuilder: (context, index) {
-            return listTile(
-              titleText: controller.starlineMarketModel.value.data
-                      ?.elementAt(index)
-                      .name ??
-                  '',
-              trailing:
-                  "${controller.starlineMarketModel.value.data?.elementAt(index).baseRate ?? ""} KA ${controller.starlineMarketModel.value.data?.elementAt(index).rate ?? ""}",
-            );
-          },
-        ),
-      ),
+      () => controller.starlineMarketModel.value.data == null
+          ? SizedBox(
+              height: 250,
+              child: Center(
+                child: Text(
+                  "There is no Data",
+                  style: CustomTextStyle.textRobotoSansMedium,
+                ),
+              ),
+            )
+          : Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: controller.starlineMarketModel.value.data?.length,
+                itemBuilder: (context, index) {
+                  return listTile(
+                    titleText: controller.starlineMarketModel.value.data
+                            ?.elementAt(index)
+                            .name ??
+                        '',
+                    trailing:
+                        "${controller.starlineMarketModel.value.data?.elementAt(index).baseRate ?? ""} KA ${controller.starlineMarketModel.value.data?.elementAt(index).rate ?? ""}",
+                  );
+                },
+              ),
+            ),
     );
   }
 

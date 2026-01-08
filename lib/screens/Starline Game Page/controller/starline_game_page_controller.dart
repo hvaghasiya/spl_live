@@ -1,53 +1,53 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:spllive/helper_files/ui_utils.dart';
-import 'package:spllive/routes/app_routes_name.dart';
+import 'package:get_storage/get_storage.dart';
+
 import '../../../helper_files/app_colors.dart';
 import '../../../helper_files/constant_variables.dart';
+import '../../../helper_files/ui_utils.dart';
 import '../../../models/commun_models/digit_list_model.dart';
 import '../../../models/commun_models/json_file_model.dart';
 import '../../../models/commun_models/starline_bid_request_model.dart';
-import '../../../models/commun_models/user_details_model.dart';
 import '../../../models/starline_daily_market_api_response.dart';
 import '../../../models/starline_game_modes_api_response_model.dart';
-import '../../Local Storage.dart';
+import '../../../routes/app_routes_name.dart';
 
 class StarLineGamePageController extends GetxController {
-  // var coinController = TextEditingController();
+  var coinController = TextEditingController();
   var searchController = TextEditingController();
-
   RxBool showNumbersLine = false.obs;
   RxBool validCoinsEntered = false.obs;
-
-  RxString totalAmount = "00".obs;
+  Timer? _debounce;
+  RxString totalAmount = "0".obs;
   int selectedIndexOfDigitRow = 0;
-
   Rx<StarLineGameMod> gameMode = StarLineGameMod().obs;
   Rx<StarlineMarketData> marketData = StarlineMarketData().obs;
-
   var argument = Get.arguments;
-  var selectedBidsList = <StarLineBids>[];
+  RxList<StarLineBids> selectedBidsList = <StarLineBids>[].obs;
   JsonFileModel jsonModel = JsonFileModel();
-
   var digitList = <DigitListModelOffline>[].obs;
-
+  var panaDigitList = <DigitListModelOffline>[].obs;
   var singleAnkList = <DigitListModelOffline>[];
   var jodiList = <DigitListModelOffline>[];
   var triplePanaList = <DigitListModelOffline>[];
   var singlePanaList = <DigitListModelOffline>[];
   var doublePanaList = <DigitListModelOffline>[];
-  List<TextEditingController> coinController = [];
   List<FocusNode> focusNodes = [];
   List<int> newList = [];
   List<StarLineBids> jp = [];
+  var getBIdType = "";
   var biddingType = "".obs;
   var marketName = "".obs;
   var marketTime = "".obs;
   var marketId = 0;
   bool getBidData = false;
+  List<String> matches = <String>[].obs;
+  RxBool isEnable = false.obs;
+  RxList<String> suggestionList = <String>[].obs;
   var digitRow = [
     DigitListModelOffline(value: "0", isSelected: false),
     DigitListModelOffline(value: "1", isSelected: false),
@@ -62,10 +62,11 @@ class StarLineGamePageController extends GetxController {
   ].obs;
   final Rx<Color> containerBorderColor = AppColors.black.obs;
   RxList<Color> containerBorderColor2 = <Color>[].obs;
-  // var arguments = Get.arguments;
+  RxInt panaControllerLength = 2.obs;
+  RxList<StarLineBids> bidList = <StarLineBids>[].obs;
   @override
   void onInit() {
-    getArguments();
+    // getArguments();
     super.onInit();
   }
 
@@ -74,126 +75,156 @@ class StarLineGamePageController extends GetxController {
     for (var focusNode in focusNodes) {
       focusNode.dispose();
     }
-    for (var controller in coinController) {
-      controller.dispose();
-    }
+    coinController.dispose();
     super.onClose();
   }
 
-  // void setContainerBorderColorForIndex(int index, Color color) {
-  //   // Update the containerBorderColor value at the specified index
-  //   containerBorderColor2[index] = color;
+  @override
+  void dispose() {
+    super.dispose();
+    searchController.dispose();
+  }
 
-  //   // Trigger an update to rebuild the UI
-  //   update();
-  // }
-
-  // Color getContainerBorderColor(int index) {
-  //   if (index < 0 || index >= containerBorderColor2.length) {
-  //     // Handle out-of-bounds index if necessary
-  //     return Colors.black; // Default border color
-  //   }
-  //   return containerBorderColor2[index];
-  // }
-
-  void initializeTextControllers() {
-    coinController.clear();
-    for (int i = 0; i < digitList.length; i++) {
-      coinController.add(TextEditingController());
+  ondebounce() {
+    if (_debounce != null && _debounce!.isActive) {
+      _debounce!.cancel();
     }
-    print(coinController.length);
+    Timer(const Duration(milliseconds: 40), () {
+      if (int.parse(coinController.text) == 0) {
+        AppUtils.showErrorSnackBar(bodyText: "Please enter minimun 1 coin");
+      }
+    });
   }
 
   void setContainerBorderColor(Color color) {
     containerBorderColor.value = color;
   }
 
-  // void setupFocusNodeListeners() {
-  //   for (int i = 0; i < digitList.length; i++) {
-  //     focusNodes[i].addListener(() {
-  //       focusNodes[i].requestFocus();
-  //     });
-  //   }
-  // }
-
   Future<void> getArguments() async {
+    if (GetStorage().read(ConstantsVariables.starlineBidsList) != null) {
+      bidList.value = GetStorage().read(ConstantsVariables.starlineBidsList);
+    }
     gameMode.value = argument['gameMode'];
     marketData.value = argument['marketData'];
     getBidData = argument['getBidData'];
+    getBIdType = argument['getBIdType'];
+
     await loadJsonFile();
     switch (gameMode.value.name) {
-      case "Single Digit":
+      case "Single Ank Bulk":
         showNumbersLine.value = false;
+        // enteredDigitsIsValidate = true;
+        panaControllerLength.value = 1;
+        suggestionList.value = jsonModel.singleAnk!;
         for (var e in jsonModel.singleAnk!) {
           singleAnkList.add(DigitListModelOffline.fromJson(e));
         }
         digitList.value = singleAnkList;
-        initializeTextControllers();
+        //    initializeTextControllers();
         break;
-      case "Jodi Digit":
-        showNumbersLine.value = false;
-        for (var e in jsonModel.jodi!) {
-          jodiList.add(DigitListModelOffline.fromJson(e));
-        }
-        digitList.value = jodiList;
-        initializeTextControllers();
-        break;
-      case "Single Pana":
+      case "Single Pana Bulk":
         digitRow.first.isSelected = true;
         showNumbersLine.value = true;
+        panaControllerLength.value = 3;
+        suggestionList.value = jsonModel.singlePana!.single.l0!;
+        // for (var e in jsonModel.singlePana!.single.l0!) {
+        //   singlePanaList.add(DigitListModelOffline.fromJson(e));
+        // }
+        for (var e in jsonModel.allSinglePana!) {
+          panaDigitList.add(DigitListModelOffline.fromJson(e));
+        }
+        List<List<DigitListModelOffline>> chunks = splitListIntoChunks(panaDigitList, 12);
 
-        for (var e in jsonModel.singlePana!.single.l0!) {
-          singlePanaList.add(DigitListModelOffline.fromJson(e));
-        }
-        digitList.value = singlePanaList;
-        initializeTextControllers();
+        digitList.value = chunks[0];
+        //  initializeTextControllers();
         break;
-      case "Double Pana":
+      case "Double Pana Bulk":
         digitRow.first.isSelected = true;
         showNumbersLine.value = true;
-        for (var e in jsonModel.doublePana!.single.l0!) {
-          doublePanaList.add(DigitListModelOffline.fromJson(e));
+        panaControllerLength.value = 3;
+        suggestionList.value = jsonModel.doublePana!.single.l0!;
+        // for (var e in jsonModel.doublePana!.single.l0!) {
+        //   doublePanaList.add(DigitListModelOffline.fromJson(e));
+        // }
+        // digitList.value = doublePanaList;
+        for (var e in jsonModel.allDoublePana!) {
+          panaDigitList.add(DigitListModelOffline.fromJson(e));
         }
-        digitList.value = doublePanaList;
-        initializeTextControllers();
+        List<List<DigitListModelOffline>> chunks = splitListIntoChunks(panaDigitList, 9);
+
+        digitList.value = chunks[0];
+        //  initializeTextControllers();
         break;
       case "Tripple Pana":
         showNumbersLine.value = false;
+        suggestionList.value = jsonModel.triplePana!;
+        panaControllerLength.value = 3;
         for (var e in jsonModel.triplePana!) {
           triplePanaList.add(DigitListModelOffline.fromJson(e));
         }
         digitList.value = triplePanaList;
-        initializeTextControllers();
+        // initializeTextControllers();
         break;
     }
-    // var data = await LocalStorage.read(ConstantsVariables.userData);
+    // var data = GetStorage().read(ConstantsVariables.userData);
     // UserDetailsModel userData = UserDetailsModel.fromJson(data);
     // requestModel.userId = userData.id;
     // requestModel.bidType = biddingType.value;
     // requestModel.dailyMarketId = marketId;
   }
 
-  void onTapOfSaveButton() async {
+  Future<void> onTapOfSaveButton() async {
     if (selectedBidsList.isNotEmpty) {
-      await LocalStorage.write(ConstantsVariables.boolData, true);
-      Get.offAndToNamed(AppRoutName.starLineGameModesPage, arguments: {
-        "bidsList": selectedBidsList,
-        "gameMode": gameMode.value,
-        "marketData": marketData.value,
-        // "biddingType": biddingType.value,
-        // "marketName": marketName.value,
-        // "marketId": marketId,
-        // "totalAmount": totalAmount.value,
-      })?.then((value) => selectedBidsList.clear());
-      for (int i = 0; i < digitList.length; i++) {
-        digitList[i].isSelected = false;
+      if (bidList.isNotEmpty) {
+        for (var i = 0; i < bidList.length; i++) {
+          // selectedBidsList.add(bidsList[i]);
+          selectedBidsList.insert(0, bidList[i]);
+          var existingIndex = selectedBidsList.indexOf(bidList[i]);
+          selectedBidsList.refresh();
+        }
+        GetStorage().write(ConstantsVariables.starlineBidsList, selectedBidsList);
+        Get.offAndToNamed(AppRoutName.starlineBidpage, arguments: {
+          "bidsList": selectedBidsList,
+          "gameMode": gameMode.value,
+          "marketData": marketData.value,
+        })?.then((value) {
+          // selectedBidsList.clear();
+        });
+        for (int i = 0; i < digitList.length; i++) {
+          digitList[i].isSelected = false;
+        }
+        digitList.refresh();
+        coinController.clear();
+      } else {
+        GetStorage().write(ConstantsVariables.starlineBidsList, selectedBidsList);
+        Get.offAndToNamed(AppRoutName.starlineBidpage, arguments: {
+          "bidsList": selectedBidsList,
+          "gameMode": gameMode.value,
+          "marketData": marketData.value,
+        })?.then((value) {
+          // selectedBidsList.clear();
+        });
+        for (int i = 0; i < digitList.length; i++) {
+          digitList[i].isSelected = false;
+        }
+        digitList.refresh();
+        coinController.clear();
+        getArguments();
       }
-      digitList.refresh();
-      // coinController.clear();
     } else {
       AppUtils.showErrorSnackBar(
         bodyText: "Please add some bids!",
       );
+    }
+  }
+
+  void onTapNumberList(index) {
+    if (validCoinsEntered.value) {
+      if (digitList[index].isSelected == false) {
+        onTapOfDigitTile(index);
+      } else {
+        onLongPressDigitTile(index);
+      }
     }
   }
 
@@ -203,109 +234,88 @@ class StarLineGamePageController extends GetxController {
     }
     digitRow[index].isSelected = true;
     digitRow.refresh();
-
-    if (gameMode.value.name == "Single Pana") {
-      panaSwitchCase(jsonModel.singlePana!.single, index);
+    if (gameMode.value.name!.toUpperCase() == "SINGLE PANA BULK") {
+      panaSwitchCase(index, 12);
     } else {
-      panaSwitchCase(jsonModel.doublePana!.single, index);
+      panaSwitchCase(index, 9);
     }
     digitList.refresh();
   }
 
   Future<void> loadJsonFile() async {
-    final String response =
-        await rootBundle.loadString('assets/JSON File/digit_file.json');
+    final String response = await rootBundle.loadString('assets/JSON File/digit_file.json');
     final data = await json.decode(response);
     jsonModel = JsonFileModel.fromJson(data);
   }
 
-  void panaSwitchCase(ThreePana panaList, int index) {
+  void panaSwitchCase(int index, int chunkSize) {
     List<DigitListModelOffline> tempList = [];
+    List<List<DigitListModelOffline>> chunks = splitListIntoChunks(panaDigitList, chunkSize);
     switch (index) {
       case 0:
-        for (var e in panaList.l0!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[0];
         break;
       case 1:
-        for (var e in panaList.l1!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[1];
         break;
       case 2:
-        for (var e in panaList.l2!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[2];
+
         break;
       case 3:
-        for (var e in panaList.l3!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[3];
         break;
       case 4:
-        for (var e in panaList.l4!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[4];
         break;
       case 5:
-        for (var e in panaList.l5!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[5];
         break;
       case 6:
-        for (var e in panaList.l6!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[6];
         break;
       case 7:
-        for (var e in panaList.l7!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[7];
         break;
       case 8:
-        for (var e in panaList.l8!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[8];
         break;
       case 9:
-        for (var e in panaList.l9!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[9];
         break;
       default:
-        for (var e in panaList.l0!) {
-          tempList.add(DigitListModelOffline.fromJson(e));
-        }
+        tempList = chunks[0];
         break;
     }
     digitList.value = tempList;
   }
 
-  // void onTapNumberList(index) {
-  //   if (digitList[index].isSelected == false) {
-  //     onTapOfDigitTile(index);
-  //     digitList[index].isSelected = true;
-  //   } else {
-  //     digitList[index].isSelected = false;
-  //     onLongPressDigitTile(index);
-  //   }
-  // }
+  List<List<DigitListModelOffline>> splitListIntoChunks(List<DigitListModelOffline> tempList, int chunkSize) {
+    List<List<DigitListModelOffline>> chunks = [];
+
+    for (var i = 0; i < tempList.length; i += chunkSize) {
+      int end = i + chunkSize;
+      if (end > tempList.length) {
+        end = tempList.length;
+      }
+      chunks.add(tempList.sublist(i, end));
+    }
+    return chunks;
+  }
+
   void onTapOfDigitTile(int index) {
-    if (coinController[index].text.isNotEmpty) {
+    if (coinController.text.isNotEmpty) {
       if (!validCoinsEntered.value) {
         AppUtils.showErrorSnackBar(bodyText: "Please enter valid coins");
         return;
       }
       int tempCoins = int.parse("${digitList[index].coins}");
-      digitList[index].coins =
-          tempCoins + int.parse(coinController[index].text);
+      digitList[index].coins = tempCoins + int.parse(coinController.text);
       digitList[index].isSelected = true;
       digitList.refresh();
       newList.add(digitList[index].coins!.toInt());
       if (selectedBidsList.isNotEmpty) {
-        var tempBid = selectedBidsList
-            .where((element) => element.bidNo == digitList[index].value)
-            .toList();
+        var tempBid = selectedBidsList.where((element) => element.bidNo == digitList[index].value).toList();
         if (tempBid.isNotEmpty) {
           for (var element in selectedBidsList) {
             if (element.bidNo == digitList[index].value) {
@@ -313,30 +323,38 @@ class StarLineGamePageController extends GetxController {
             }
           }
         } else {
-          selectedBidsList.add(
+          selectedBidsList.insert(
+            0,
             StarLineBids(
               bidNo: digitList[index].value,
-              coins: int.parse(coinController[index].text),
+              coins: int.parse(coinController.text),
               starlineGameId: gameMode.value.id,
-              remarks:
-                  "You invested At ${marketData.value.time} on ${digitList[index].value} (${gameMode.value.name})",
+              remarks: "You invested At ${marketData.value.time} on ${digitList[index].value} (${gameMode.value.name})",
             ),
           );
+          //_calculateTotalAmount();
         }
       } else {
-        selectedBidsList.add(
+        selectedBidsList.insert(
+          0,
           StarLineBids(
             bidNo: digitList[index].value,
-            coins: int.parse(coinController[index].text),
+            coins: int.parse(coinController.text),
             starlineGameId: gameMode.value.id,
-            remarks:
-                "You invested At ${marketData.value.time} on ${digitList[index].value} (${gameMode.value.name})",
+            remarks: "You invested At ${marketData.value.time} on ${digitList[index].value} (${gameMode.value.name})",
           ),
         );
       }
-      print("============ ${selectedBidsList.toList()}");
+
       _calculateTotalAmount();
     } else {
+      validCoinsEntered.value = false;
+      digitList.refresh();
+      digitList[index].isSelected = false;
+      isEnable.value = false;
+      digitList.refresh();
+      // selectedBidsList
+      // .removeWhere((element) => element.bidNo == digitList[index].value);
       AppUtils.showErrorSnackBar(bodyText: "Please enter coins!");
     }
   }
@@ -345,8 +363,7 @@ class StarLineGamePageController extends GetxController {
     digitList[index].coins = 0;
     digitList[index].isSelected = false;
     digitList.refresh();
-    selectedBidsList
-        .removeWhere((element) => element.bidNo == digitList[index].value);
+    selectedBidsList.removeWhere((element) => element.bidNo == digitList[index].value);
     _calculateTotalAmount();
   }
 
@@ -356,5 +373,36 @@ class StarLineGamePageController extends GetxController {
       tempTotal += element.coins ?? 0;
     }
     totalAmount.value = tempTotal.toString();
+  }
+
+  void onSearch(val) {
+    digitList.refresh();
+
+    List<DigitListModelOffline> tempList = digitList;
+    if (val.toString().isNotEmpty) {
+      var searchResultList = tempList
+          .where(
+              (element) => element.value.toString().toLowerCase().trim().contains(val.toString().toLowerCase().trim()))
+          .toList();
+      searchResultList.toSet().toList();
+      digitList.value = searchResultList;
+    } else {
+      switch (gameMode.value.id) {
+        case 5:
+          digitList.value = singleAnkList;
+          break;
+        case 6:
+          //panaSwitchCase(selectedIndexOfDigitRow, 12);
+          digitList.value = panaDigitList;
+          break;
+        case 7:
+          //panaSwitchCase(selectedIndexOfDigitRow, 9);
+          digitList.value = panaDigitList;
+          break;
+        default:
+          AppUtils.showErrorSnackBar(bodyText: "SOMETHINGWENTWRONG".tr);
+          break;
+      }
+    }
   }
 }

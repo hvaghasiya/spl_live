@@ -18,10 +18,9 @@ class StarlineTermsPageController extends GetxController {
     ApiService()
         .getGameRates(forStarlineGameModes: forStarlineGameModes)
         .then((value) async {
-      print("Get withdrawal time Api Response :- $value");
       if (value['status']) {
         starlineMarketModel.value = MarketRatesApiResponseModel.fromJson(value);
-        print(starlineMarketModel.value);
+      
       } else {
         AppUtils.showErrorSnackBar(
           bodyText: value['message'] ?? "",
