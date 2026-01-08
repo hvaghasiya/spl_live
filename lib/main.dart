@@ -7,6 +7,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freshchat_sdk/freshchat_sdk.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -33,6 +34,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Permission.notification.request();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  Freshchat.init(
+    "fea6f54d-1556-49ad-9365-0dbe3649df17",
+    "7fa82d26-7cf0-41cb-bd99-cb120f18d25d",
+    "msdk.in.freshchat.com",
+  );
+
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessegingBackgroundHendler);
   try {
     final remoteConfig = FirebaseRemoteConfig.instance;
@@ -60,7 +69,8 @@ void main() async {
   runApp(GlobalWrapper(child: const MyApp()));
 }
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey(debugLabel: "Main Navigator");
+final GlobalKey<NavigatorState> navigatorKey =
+    GlobalKey(debugLabel: "Main Navigator");
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -73,6 +83,7 @@ class _MyAppState extends State<MyApp> {
   final con = Get.put<InactivityController>(InactivityController());
   bool _jailbroken = false;
   StreamSubscription? subscription;
+
   getAppVersion() async {
     FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
 
@@ -100,8 +111,10 @@ class _MyAppState extends State<MyApp> {
     HttpOverrides.global = MyHttpOverrides();
     NotificationServices().firebaseInit(context);
     NotificationServices().setuoIntrectMessege(context);
-    NotificationServices().getDeviceToken().then((value) => GetStorage().write(ConstantsVariables.fcmToken, value));
-    print("ConstantsVariables.fcmTokenConstantsVariables.fcmToken ${GetStorage().read(ConstantsVariables.fcmToken)}");
+    NotificationServices().getDeviceToken().then(
+        (value) => GetStorage().write(ConstantsVariables.fcmToken, value));
+    print(
+        "ConstantsVariables.fcmTokenConstantsVariables.fcmToken ${GetStorage().read(ConstantsVariables.fcmToken)}");
     //   initPlatformState();
   }
 
@@ -197,7 +210,9 @@ class _MyAppState extends State<MyApp> {
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -210,7 +225,8 @@ class AppStateListener extends WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         bool alreadyLoggedIn = con.getStoredUserData();
-        var mPinTimeOut = GetStorage().read(ConstantsVariables.mPinTimeOut) ?? true;
+        var mPinTimeOut =
+            GetStorage().read(ConstantsVariables.mPinTimeOut) ?? true;
         if (alreadyLoggedIn && !mPinTimeOut) {
           GetStorage().write(ConstantsVariables.timeOut, true);
         } else {
@@ -236,6 +252,7 @@ class AppStateListener extends WidgetsBindingObserver {
 
 class GlobalWrapper extends StatelessWidget {
   final Widget child;
+
   const GlobalWrapper({Key? key, required this.child}) : super(key: key);
 
   @override
@@ -249,7 +266,11 @@ class GlobalWrapper extends StatelessWidget {
             print(newAppVersion.value);
             print(appVersion.value);
             print("sffjkhfkjfhdksfsdf");
-            return newAppVersion.value.isNotEmpty && appVersion.isNotEmpty && newAppVersion.value != appVersion.value ? UpdateDialog() : SizedBox();
+            return newAppVersion.value.isNotEmpty &&
+                    appVersion.isNotEmpty &&
+                    newAppVersion.value != appVersion.value
+                ? UpdateDialog()
+                : SizedBox();
           }),
         ],
       ),

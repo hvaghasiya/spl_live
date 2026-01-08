@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:freshchat_sdk/freshchat_sdk.dart';
+import 'package:freshchat_sdk/freshchat_user.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
@@ -29,6 +31,13 @@ class HomeController extends GetxController {
   RxList<MarketData> normalMarketFilterList = <MarketData>[].obs;
   RxInt getNotificationCount = 0.obs;
   final selectedIndex = Rxn<int>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    setFreshchatUser();
+  }
+
 
   TextEditingController dateInputForResultHistory = TextEditingController();
   String? date;
@@ -187,6 +196,44 @@ class HomeController extends GetxController {
       },
     );
   }
+
+  void setFreshchatUser() {
+    try {
+      final storedData = GetStorage().read(ConstantsVariables.userData);
+      if (storedData == null) {
+        debugPrint("Freshchat: No user data found");
+        return;
+      }
+
+      final userData = UserDetailsModel.fromJson(storedData);
+
+      FreshchatUser freshchatUser = FreshchatUser(
+        userData.id?.toString() ?? "",
+        null,
+      );
+
+      freshchatUser.setFirstName(userData.userName ?? "User");
+      freshchatUser.setLastName(userData.fullName ?? "");
+
+      freshchatUser.setPhone(
+        userData.phoneNumber ?? "",
+        userData.countryCode ?? "91",
+      );
+
+      Freshchat.setUser(freshchatUser);
+
+      Freshchat.setUserProperties({
+        "user_id": userData.id?.toString() ?? "",
+        "device_id": userData.deviceId ?? "",
+      });
+
+    } catch (e) {
+      debugPrint("Freshchat user set error: $e");
+    }
+  }
+
+
+
 
   ///// notifications
 

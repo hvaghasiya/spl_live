@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:freshchat_sdk/freshchat_sdk.dart';
 import 'package:get/get.dart';
 
 // import 'package:spllive/Custom%20Controllers/wallet_controller.dart';
@@ -185,10 +186,14 @@ class _MoreOptionsState extends State<MoreOptions> {
                   text: "GIVEFEEDBACK".tr,
                 ),
                 listItems(
-                  onTap: () => controller.getFeedbackAndRatingsById(),
-                  iconData: ConstantImage.rateNew,
-                  text: "RATEUS".tr,
+                  onTap: () {
+                    Freshchat.showConversations();
+                  },
+                  iconData: ConstantImage.giveFeedbackIcon,
+                  text: "CHAT / SUPPORT",
                 ),
+
+
                 // listItems(
                 //   onTap: () => Get.toNamed(AppRoutName.aboutPage),
                 //   iconData: ConstantImage.infoIcon,

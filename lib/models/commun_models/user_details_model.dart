@@ -7,6 +7,7 @@ class UserDetailsModel {
   String? deviceId;
   String? token;
 
+
   UserDetailsModel(
       {this.id,
         this.userName,
