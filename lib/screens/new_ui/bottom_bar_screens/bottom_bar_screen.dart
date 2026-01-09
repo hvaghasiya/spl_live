@@ -2,6 +2,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:freshchat_sdk/freshchat_sdk.dart';
 import 'package:get/get.dart';
 
 import '../../../Custom Controllers/wallet_controller.dart';
@@ -74,23 +75,53 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
             selectedItemColor: AppColors.appbarColor,
             unselectedLabelStyle: CustomTextStyle.textPTsansMedium.copyWith(fontSize: 14),
             selectedLabelStyle: CustomTextStyle.textPTsansMedium.copyWith(fontSize: 14),
+            // onTap: (v) async {
+            //   homeCon.pageWidget.value = v;
+            //
+            //   if (homeCon.pageWidget.value == 2) {
+            //     walletCon.selectedIndex.value = null;
+            //   }
+            //   if (homeCon.pageWidget.value != 3) {
+            //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+            //   }
+            //   if (dialogShown.value == false) {
+            //     FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+            //
+            //     await remoteConfig.fetchAndActivate();
+            //
+            //     newAppVersion.value = remoteConfig.getString('AppVersion');
+            //     print("gdfgdfgdfgdgdfgf");
+            //     print(newAppVersion.value);
+            //     newAppVersion.refresh();
+            //   }
+            // },
             onTap: (v) async {
+              // CHAT TAB → OPEN FRESHWORKS
+              if (v == 4) {
+                Freshchat.showConversations();
+                return;
+              }
+
               homeCon.pageWidget.value = v;
 
               if (homeCon.pageWidget.value == 2) {
                 walletCon.selectedIndex.value = null;
               }
+
               if (homeCon.pageWidget.value != 3) {
-                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.landscapeLeft,
+                ]);
               }
+
               if (dialogShown.value == false) {
                 FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
 
                 await remoteConfig.fetchAndActivate();
 
                 newAppVersion.value = remoteConfig.getString('AppVersion');
-                print("gdfgdfgdfgdgdfgf");
-                print(newAppVersion.value);
+                print("Remote App Version: ${newAppVersion.value}");
                 newAppVersion.refresh();
               }
             },
@@ -140,18 +171,28 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                 label: "Passbook",
               ),
               BottomNavigationBarItem(
-                icon: Container(
-                  width: 20,
-                  height: 15,
-                  margin: EdgeInsets.only(bottom: 4),
-                  child: SvgPicture.asset(
-                    ConstantImage.moreIcon,
-                    width: 15,
-                    color: homeCon.pageWidget.value == 4 ? AppColors.appbarColor : AppColors.black,
-                  ),
+                icon: Icon(
+                  Icons.chat,
+                  size: 18,
+                  color: homeCon.pageWidget.value == 4
+                      ? AppColors.appbarColor
+                      : AppColors.black,
                 ),
-                label: "More",
-              )
+                label: "Chat",
+              ),
+              // BottomNavigationBarItem(
+              //   icon: Container(
+              //     width: 20,
+              //     height: 15,
+              //     margin: EdgeInsets.only(bottom: 4),
+              //     child: SvgPicture.asset(
+              //       ConstantImage.moreIcon,
+              //       width: 15,
+              //       color: homeCon.pageWidget.value == 4 ? AppColors.appbarColor : AppColors.black,
+              //     ),
+              //   ),
+              //   label: "More",
+              // )
             ],
           ),
         ),

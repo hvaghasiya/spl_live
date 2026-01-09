@@ -144,7 +144,6 @@ class HomeController extends GetxController {
     }
   }
 
-  //// Normal Market bids
   RxList<MarketBidHistoryList> marketBidHistoryList = <MarketBidHistoryList>[].obs;
   RxInt offset = 0.obs;
   RxList<ResultArr> marketHistoryList = <ResultArr>[].obs;
@@ -198,39 +197,26 @@ class HomeController extends GetxController {
   }
 
   void setFreshchatUser() {
-    try {
-      final storedData = GetStorage().read(ConstantsVariables.userData);
-      if (storedData == null) {
-        debugPrint("Freshchat: No user data found");
-        return;
-      }
+    final storedData = GetStorage().read(ConstantsVariables.userData);
+    if (storedData == null) return;
 
-      final userData = UserDetailsModel.fromJson(storedData);
+    final userData = UserDetailsModel.fromJson(storedData);
 
-      FreshchatUser freshchatUser = FreshchatUser(
-        userData.id?.toString() ?? "",
-        null,
-      );
+    FreshchatUser user = FreshchatUser(
+      userData.id.toString(),
+      "",
+    );
 
-      freshchatUser.setFirstName(userData.userName ?? "User");
-      freshchatUser.setLastName(userData.fullName ?? "");
+    user.setFirstName(userData.userName ?? "User");
+    user.setLastName(userData.fullName ?? "");
+    user.setPhone(
+      userData.phoneNumber ?? "",
+      userData.countryCode ?? "91",
+    );
 
-      freshchatUser.setPhone(
-        userData.phoneNumber ?? "",
-        userData.countryCode ?? "91",
-      );
-
-      Freshchat.setUser(freshchatUser);
-
-      Freshchat.setUserProperties({
-        "user_id": userData.id?.toString() ?? "",
-        "device_id": userData.deviceId ?? "",
-      });
-
-    } catch (e) {
-      debugPrint("Freshchat user set error: $e");
-    }
+    Freshchat.setUser(user);
   }
+
 
 
 

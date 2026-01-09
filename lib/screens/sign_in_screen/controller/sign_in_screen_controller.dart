@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:freshchat_sdk/freshchat_sdk.dart';
+import 'package:freshchat_sdk/freshchat_user.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -8,6 +10,7 @@ import '../../../api_services/api_service.dart';
 import '../../../components/DeviceInfo/device_info.dart';
 import '../../../helper_files/constant_variables.dart';
 import '../../../helper_files/ui_utils.dart';
+import '../../../models/commun_models/user_details_model.dart';
 import '../../../routes/app_routes_name.dart';
 
 class SignInPageController extends GetxController {
@@ -35,29 +38,45 @@ class SignInPageController extends GetxController {
       "countryCode": "+91",
       "deviceId": DeviceInfo.deviceId,
     }).then((value) async {
-      if (value['status']) {
-        if (value['data'] != null) {
-          String authToken = value['data']['Token'] ?? "Null From API";
-          bool isActive = value['data']['IsActive'] ?? false;
-          bool isVerified = value['data']['IsVerified'] ?? false;
-          bool isUserDetailSet = value['data']['IsUserDetailSet'] ?? false;
-          GetStorage().write(ConstantsVariables.authToken, authToken);
-          GetStorage().write(ConstantsVariables.isActive, isActive);
-          GetStorage().write(ConstantsVariables.isVerified, isVerified);
-          GetStorage().write(ConstantsVariables.userData, value['data']);
-          GetStorage().write(ConstantsVariables.isUserDetailSet, isUserDetailSet);
-          GetStorage().write(ConstantsVariables.id, value['data']["Id"]);
-          Get.toNamed(AppRoutName.setMPINPage);
-        } else {
-          AppUtils.showErrorSnackBar(bodyText: "Something went wrong!!!");
-        }
+      if (value['status'] && value['data'] != null) {
+
+        final userData = UserDetailsModel.fromJson(value['data']);
+
+        GetStorage().write(ConstantsVariables.authToken, value['data']['Token']);
+        GetStorage().write(ConstantsVariables.isActive, value['data']['IsActive']);
+        GetStorage().write(ConstantsVariables.isVerified, value['data']['IsVerified']);
+        GetStorage().write(ConstantsVariables.isUserDetailSet, value['data']['IsUserDetailSet']);
+        GetStorage().write(ConstantsVariables.userData, value['data']);
+        GetStorage().write(ConstantsVariables.id, value['data']["Id"]);
+
+        attachFreshchatUser(userData);
+
+        Get.toNamed(AppRoutName.setMPINPage);
       } else {
-        print("value['message'].length >= 15 ${value['message'].length}");
-        print("value['message'].length >= 15 ${value['message'].length <= 17}");
         AppUtils().accountFlowDialog(msg: value['message']);
       }
     });
   }
+
+  void attachFreshchatUser(UserDetailsModel userData) {
+
+    final FreshchatUser user = FreshchatUser(
+      userData.id.toString(),
+      "",
+    );
+
+    user.setFirstName(userData.userName ?? "User");
+
+    if (userData.phoneNumber != null && userData.phoneNumber!.isNotEmpty) {
+      user.setPhone(
+        userData.phoneNumber!,
+        userData.countryCode ?? "91",
+      );
+    }
+
+    Freshchat.setUser(user);
+  }
+
 
   void onTapOfSignIn() {
     FocusManager.instance.primaryFocus?.unfocus();

@@ -4,6 +4,7 @@ class ApiUtils {
   // local url
   // static String baseURL = "http://192.168.1.9:8080";
   static String baseURL = "http://192.168.0.240:8080";
+  // static String baseURL = "http://192.168.0.5:8080";
 
   // StagingURl
   // static String baseURL = "http://15.207.71.94:9867";
@@ -80,7 +81,7 @@ class ApiUtils {
   // static String appKillApi = "$baseURL/user/log/out";
   static String addFund = "$baseURL/payment/process";
 
-  ///
+  /// Wallet Transaction History
   static String getWalletTransactionHistory = "$baseURL/payment/getByUserId";
   static String putWalletTransactionStatus = "$baseURL/payment/ReadPaymentNotification";
   static String getAllPackages = "$baseURL/payment/getAllPackages";
@@ -96,6 +97,7 @@ class ApiUtils {
   static String getStarlineBanner = "$baseURL/banner/getAll";
   static String getMarketsData = "$baseURL/market/marketsByDate";
 
+  /// Market Result
   static String marketResult = "$baseURL/market/marketResult";
   static String checkBankDetails = "$baseURL/bank/checkBankDetails";
   static String paymentStatus = "$baseURL/payment/paymentStatus";
