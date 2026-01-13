@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
@@ -10,6 +11,7 @@ import '../../helper_files/constant_image.dart';
 import '../../helper_files/custom_text_style.dart';
 import '../../helper_files/dimentions.dart';
 import '../../helper_files/ui_utils.dart';
+import '../../widget/promo_video_player.dart';
 import 'controller/homepage_controller.dart';
 
 class AddFund extends StatefulWidget {
@@ -24,6 +26,8 @@ class AddFund extends StatefulWidget {
 class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
   final homeCon = Get.put(HomePageController());
   final walletCon = Get.find<WalletController>();
+
+  final String promotionalVideoLink = "https://www.youtube.com/watch?v=2ky-tWGD13Q";
 
   @override
   void initState() {
@@ -81,7 +85,52 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
           child: Column(
             // mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 6,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 2),
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(10.w),
+                        child: Text(
+                          "How to Add Funds",
+                          style: CustomTextStyle.textRobotoMedium.copyWith(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: PromoVideoPlayer(
+                            videoUrl: promotionalVideoLink,
+                            isAutoPlay: false,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 0.1.h),
+              SizedBox(height: 1.h),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Container(
@@ -106,7 +155,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                         style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: Dimensions.h22),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +183,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 2),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: TextFormField(
@@ -165,7 +214,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 0.5.h),
               Obx(
                 () => Wrap(
                   alignment: WrapAlignment.center,
@@ -206,7 +255,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                   ).toList(),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 0.2.h),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: RoundedCornerButton(
@@ -238,7 +287,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                   width: Get.width / 2,
                 ),
               ),
-              SizedBox(height: Get.height * 0.06),
+              SizedBox(height: Get.height * 0.0001),
               Divider(endIndent: 20, indent: 20, color: AppColors.black),
               const SizedBox(height: 10),
               Text(
@@ -248,61 +297,63 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                   color: AppColors.black,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 0.2.h),
               Wrap(
+                alignment: WrapAlignment.spaceBetween,
+
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 15.0),
                     child: Image.asset(
                       ConstantImage.gPay,
-                      height: 55,
-                      width: 55,
+                      height: 44,
+                      width: 44,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 15.0),
                     child: Image.asset(
                       ConstantImage.paytm,
-                      height: 55,
-                      width: 55,
+                      height: 44,
+                      width: 44,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 15.0),
                     child: Image.asset(
                       ConstantImage.amazon,
-                      height: 55,
-                      width: 55,
+                      height: 44,
+                      width: 44,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 15.0),
                     child: Image.asset(
                       ConstantImage.phonepay,
-                      height: 55,
-                      width: 55,
+                      height: 44,
+                      width: 44,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 15.0),
                     child: Image.asset(
                       ConstantImage.icici_bank,
-                      height: 55,
-                      width: 55,
+                      height: 44,
+                      width: 44,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 1.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
+                    padding: const EdgeInsets.only(right: 10.0),
                     child: Image.asset(ConstantImage.bhim),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
+                    padding: const EdgeInsets.only(right: 10.0),
                     child: Image.asset(ConstantImage.upi),
                   ),
                 ],
