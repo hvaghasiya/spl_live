@@ -36,8 +36,8 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   Freshchat.init(
-    "fea6f54d-1556-49ad-9365-0dbe3649df17",
-    "7fa82d26-7cf0-41cb-bd99-cb120f18d25d",
+    "730f09cb-3006-4820-af0a-618a7022340a",
+    "26bb372b-d6c5-4a76-abce-fb0c3124d8b6",
     "msdk.in.freshchat.com",
   );
 
