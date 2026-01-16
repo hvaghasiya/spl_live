@@ -34,6 +34,7 @@ import '../../bottum_navigation_screens/moreoptions.dart';
 import '../../bottum_navigation_screens/passbook_page.dart';
 import '../../bottum_navigation_screens/spl_wallet.dart';
 import '../utils/home_screen_utils.dart';
+import '../utils/payment_webview.dart';
 
 class HomePageController extends GetxController {
   TextEditingController dateinput = TextEditingController();
@@ -322,71 +323,97 @@ class HomePageController extends GetxController {
   Future<void> addFund({String? amount}) async {
     try {
       ApiService().addFund(amount: amount).then((value) async {
-        print("Add Fund Response: $value");
+        debugPrint("Add Fund Response: $value");
 
         if (value['status'] == true && value['data'] != null) {
-          var responseData = value['data'];
+          final data = value['data']; // ✅ THIS IS THE VARIABLE
 
-          if (responseData['status'] == true) {
-            walletController.addFundID = responseData['paymentId'];
+          // Save for later status check
+          walletController.addFundID = data['paymentId'];
+          walletController.paymentUrl = data['payment_url'];
+          walletController.upiIntent = data['upi_intent'];
 
-            String? upiLink;
-            String webUrl = responseData['data']['payment_url'] ?? "";
-
-            // Check if UPI intent data is available
-            if (responseData['data'] != null &&
-                responseData['data']['upi_intent'] != null) {
-              // Try getting bhim_link as preferred option
-              upiLink = responseData['data']['upi_intent']['bhim_link'];
-            }
-
-            // Logic: Try UPI App first, if failed/not found, use Web Browser fallback
-            if (upiLink != null && upiLink.isNotEmpty) {
-              await _launchPaymentUrl(upiLink, webUrl);
-            } else {
-              await _launchPaymentUrl(webUrl, null);
-            }
-          } else {
-            AppUtils.showErrorSnackBar(
-                bodyText: responseData['msg'] ?? "Payment creation failed");
-          }
+          // ✅ YAHAN PAYMENT SCREEN OPEN HOGA
+          Get.to(() => PaymentScreen(
+            paymentUrl: data['payment_url'],
+            upiIntent: data['upi_intent'],
+          ));
         } else {
-          // API request failed
-          Get.defaultDialog(
-            barrierDismissible: false,
-            title: "",
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  value['message'] ?? "Error",
-                  textAlign: TextAlign.center,
-                  style: CustomTextStyle.textRobotoSansMedium,
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () => Get.back(),
-                  child: Text("OK"),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.appbarColor),
-                )
-              ],
-            ),
+          AppUtils.showErrorSnackBar(
+            bodyText: value['message'] ?? "Payment failed",
           );
         }
       });
     } catch (e) {
-      print("Error in addFund: $e");
+      debugPrint("Error in addFund: $e");
       AppUtils.showErrorSnackBar(bodyText: "Something went wrong");
     }
   }
 
-  // New Smart Launch Function with Fallback
+
+  String convertToIntentUrl(String upiUrl) {
+    if (upiUrl.startsWith('upi://pay')) {
+      return upiUrl.replaceFirst(
+        'upi://pay',
+        'intent://pay#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end',
+      );
+    }
+    return upiUrl;
+  }
+
+
+  Future<void> launchPayment({
+    required Map<String, dynamic> upiIntent,
+    required String paymentUrl,
+  }) async {
+    try {
+      // All possible UPI links from backend
+      final upiLinks = [
+        upiIntent['bhim_link'],
+        upiIntent['gpay_link'],
+        upiIntent['phonepe_link'],
+        upiIntent['paytm_link'],
+      ];
+
+      bool upiAppFound = false;
+
+      for (final link in upiLinks) {
+        if (link == null || link.isEmpty) continue;
+
+        final uri = Uri.parse(link);
+
+        try {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalNonBrowserApplication,
+          );
+          upiAppFound = true;
+          return;
+        } catch (_) {
+
+        }
+      }
+
+      if (!upiAppFound) {
+        await launchUrl(
+          Uri.parse(paymentUrl),
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    } catch (e) {
+
+      await launchUrl(
+        Uri.parse(paymentUrl),
+        mode: LaunchMode.externalApplication,
+      );
+    }
+  }
+
+
   Future<void> _launchPaymentUrl(String mainUrl, String? fallbackUrl) async {
     try {
       Uri uri = Uri.parse(mainUrl);
 
-      // Try launching external app (UPI App)
       bool launched = await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
@@ -398,7 +425,6 @@ class HomePageController extends GetxController {
     } catch (e) {
       print("Direct launch failed: $e");
 
-      // Agar UPI app nahi khula, to Fallback URL (Browser) try karo
       if (fallbackUrl != null && fallbackUrl.isNotEmpty) {
         print("Trying fallback URL: $fallbackUrl");
         try {

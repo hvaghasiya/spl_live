@@ -393,6 +393,10 @@ class WalletController extends GetxController {
 
   RxList<FundTransactionList> fundTransactionList = <FundTransactionList>[].obs;
 
+  set paymentUrl(paymentUrl) {}
+
+  set upiIntent(upiIntent) {}
+
   void paymentStatus(paymentId) {
     ApiService().getPaymentStatus(paymentId).then((value) async {
       if (value['data']['Status'] != null) {

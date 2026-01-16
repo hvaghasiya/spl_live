@@ -85,50 +85,84 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
           child: Column(
             // mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 6,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 2),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+          Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 6,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 5),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+
+
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10.r),
+                  child: Stack(
+                    alignment: Alignment.bottomLeft,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.all(10.w),
-                        child: Text(
-                          "How to Add Funds",
-                          style: CustomTextStyle.textRobotoMedium.copyWith(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      // 1. VIDEO PLAYER LAYER
+                      AspectRatio(
+                        aspectRatio: 11 / 5.0,
+                        child: PromoVideoPlayer(
+                          videoUrl: promotionalVideoLink,
+                          isAutoPlay: false,
                         ),
                       ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10.r),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: PromoVideoPlayer(
-                            videoUrl: promotionalVideoLink,
-                            isAutoPlay: false,
+
+
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.all(19.w),
+                          decoration: BoxDecoration(
+
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.8),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                          child: Text(
+                            "How to Add Funds",
+                            style: CustomTextStyle.textRobotoMedium.copyWith(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              shadows: [
+
+                                Shadow(
+                                  offset: const Offset(0, 1),
+                                  blurRadius: 10.0,
+                                  color: Colors.black,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-
+              ],
+            ),
+          ),
+        ),
               SizedBox(height: 0.1.h),
               SizedBox(height: 1.h),
               Padding(
@@ -280,6 +314,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                           walletCon.isCallDialog.value = true;
                           homeCon.addFund(amount: homeCon.addFundCon.text);
                         }
+
                       }
                     }
                   },

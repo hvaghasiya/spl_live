@@ -1331,34 +1331,65 @@ class ApiService extends GetConnect implements GetxService {
     }
   }
 
+  // Future<dynamic> getPaymentStatus(paymentId) async {
+  //   try {
+  //     AppUtils.showProgressDialog(isCancellable: false);
+  //     await initApiService();
+  //     final response = await GetConnect(timeout: Duration(seconds: 20), allowAutoSignedCert: true).post(
+  //       ApiUtils.paymentStatus,
+  //       // {"paymentId": paymentId},
+  //       {"paymentId": 25},
+  //       headers: headersWithToken,
+  //     );
+  //     if (kDebugMode) {
+  //       developer.log("RESPONSE HEADER:  ${response.request?.url} RESPONSE : ${response.body} RESPONSE STATUS CODE:  ${response.statusCode} ");
+  //     }
+  //
+  //     if (response.status.hasError) {
+  //       AppUtils.hideProgressDialog();
+  //       if (response.status.code != null && response.status.code == 401) {
+  //         tokenExpired();
+  //       }
+  //       return Future.error(response.statusText!);
+  //     } else {
+  //       AppUtils.hideProgressDialog();
+  //       return response.body;
+  //     }
+  //   } catch (e) {
+  //     AppUtils.hideProgressDialog();
+  //   }
+  // }
+
   Future<dynamic> getPaymentStatus(paymentId) async {
     try {
-      AppUtils.showProgressDialog(isCancellable: false);
       await initApiService();
-      final response = await GetConnect(timeout: Duration(seconds: 20), allowAutoSignedCert: true).post(
+
+      final response = await GetConnect(
+        timeout: const Duration(seconds: 20),
+        allowAutoSignedCert: true,
+      ).post(
         ApiUtils.paymentStatus,
-        // {"paymentId": paymentId},
-        {"paymentId": 25},
+        {"paymentId": paymentId},
         headers: headersWithToken,
       );
+
       if (kDebugMode) {
-        developer.log("RESPONSE HEADER:  ${response.request?.url} RESPONSE : ${response.body} RESPONSE STATUS CODE:  ${response.statusCode} ");
+        developer.log(
+          "PAYMENT STATUS RESPONSE : ${response.body} URL: ${response.request?.url}",
+        );
       }
 
       if (response.status.hasError) {
-        AppUtils.hideProgressDialog();
-        if (response.status.code != null && response.status.code == 401) {
-          tokenExpired();
-        }
+        if (response.status.code == 401) tokenExpired();
         return Future.error(response.statusText!);
       } else {
-        AppUtils.hideProgressDialog();
         return response.body;
       }
     } catch (e) {
-      AppUtils.hideProgressDialog();
+      return null;
     }
   }
+
 
   Future<FundTransactionModel?> getTransactionHistory(limit, offset) async {
     try {
@@ -1524,4 +1555,27 @@ class ApiService extends GetConnect implements GetxService {
       return null;
     }
   }
+
+  Future<dynamic> createAddFundOrder({required String amount}) async {
+    await initApiService();
+
+    final response = await GetConnect(
+      timeout: const Duration(seconds: 15),
+      allowAutoSignedCert: true,
+    ).post(
+      ApiUtils.addFund,
+      {"amount": amount},
+      headers: headersWithToken,
+    );
+
+    if (response.status.hasError) {
+      return Future.error(response.statusText!);
+    } else {
+      return response.body;
+    }
+  }
+  Future<dynamic> checkPaymentStatus({required int paymentId}) async {
+    return await getPaymentStatus(paymentId);
+  }
+
 }
