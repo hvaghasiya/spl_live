@@ -110,6 +110,9 @@ class WalletController extends GetxController {
       if (value != null) {
         if (value.status ?? false) {
           value.fundTransactionList?.forEach((element) {
+            if (element.status == "Ok") {
+              element.status = "Success";
+            }
             fundTransactionList.value.add(element);
           });
           fundTransactionList.refresh();
@@ -119,7 +122,7 @@ class WalletController extends GetxController {
           isLoading.value = false;
           if (view) {
             if (isCallDialog.value) {
-              if (fundTransactionList[0].status == "Ok") {
+              if (fundTransactionList[0].status == "Success") {
                 isCallDialog.value = false;
                 Get.defaultDialog(
                   barrierDismissible: false,

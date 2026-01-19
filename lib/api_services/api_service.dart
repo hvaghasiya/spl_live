@@ -1331,6 +1331,42 @@ class ApiService extends GetConnect implements GetxService {
     }
   }
 
+  Future<dynamic> checkOrderStatus({required String clientTxnId, required String orderId}) async {
+    try {
+      await initApiService();
+
+      final response = await GetConnect(
+          timeout: const Duration(seconds: 15),
+          allowAutoSignedCert: true
+      ).get(
+        ApiUtils.orderStatus,
+        headers: headersWithToken,
+        query: {
+          "clientTxnId": clientTxnId,
+          "orderId": orderId,
+        },
+      );
+
+      if (kDebugMode) {
+        developer.log("Check Order Status URL: ${response.request?.url}");
+        developer.log("Response: ${response.body}");
+      }
+
+      if (response.status.hasError) {
+
+        if (response.status.code != null && response.status.code == 401) {
+          tokenExpired();
+        }
+        return Future.error(response.statusText!);
+      } else {
+        return response.body;
+      }
+    } catch (e) {
+      developer.log("API Error: $e");
+      return null;
+    }
+  }
+
   // Future<dynamic> getPaymentStatus(paymentId) async {
   //   try {
   //     AppUtils.showProgressDialog(isCancellable: false);

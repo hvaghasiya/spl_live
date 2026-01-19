@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SPL</string>
+
+    <!-- Freshchat -->
+    <string name="freshchat_file_provider_authority">
+        com.example.letshope.provider
+    </string>
+
+    <string name="freshchat_contact_us">Submit Feedback</string>
+    <string name="freshchat_no_articles_found">Na-ahh.. no result</string>
+    <string name="freshchat_no_faq_found">Sorry, no results</string>
+
+    <string name="freshchatDisableFrame">
+<!--        2c6935125dbbc6b2bfeeca941d75fd2e-->
+<!--        26bb372bd6c54a76abcefb0c3124d8b6-->
+<!--        730f09cb30064820af0a618a7022340a-->
+        26bb372b-d6c5-4a76-abce-fb0c3124d8b6
+    </string>
+
+</resources>

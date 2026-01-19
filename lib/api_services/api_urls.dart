@@ -101,6 +101,7 @@ class ApiUtils {
   static String marketResult = "$baseURL/market/marketResult";
   static String checkBankDetails = "$baseURL/bank/checkBankDetails";
   static String paymentStatus = "$baseURL/payment/paymentStatus";
+  static String orderStatus = "$baseURL/payment/order-status";
 
   var paymentId;
 }
