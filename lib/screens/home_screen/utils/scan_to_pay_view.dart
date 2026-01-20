@@ -190,16 +190,19 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
 
 
     if (isPhonePe) {
-      _isPaymentAppOpened = true;
-      try {
+      final Uri phonePeUri = Uri.parse("phonepe://pay");
 
-        Uri uri = Uri.parse("phonepe://");
-
-
-        await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
-      } catch (e) {
+      final bool installed = await canLaunchUrl(phonePeUri);
+      if (!installed) {
         AppUtils.showErrorSnackBar(bodyText: "PhonePe app not installed");
+        return;
       }
+
+      _isPaymentAppOpened = true;
+      await launchUrl(
+        phonePeUri,
+        mode: LaunchMode.externalNonBrowserApplication,
+      );
       return;
     }
 
@@ -426,7 +429,7 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
                 Row(
                   children: [
 
-                    Expanded(child: InkWell(onTap: () => _launchUPI(null, isPhonePe: true), child: _buildPaymentButton(assetName: ConstantImage.phonepay, label: "PhonePe"))),
+                    Expanded(child: InkWell(onTap: () async{await _saveQrToGallery(); _launchUPI(null, isPhonePe: true); }, child: _buildPaymentButton(assetName: ConstantImage.phonepay, label: "PhonePe"))),
                   ],
                 ),
                 SizedBox(height: 20.h),
