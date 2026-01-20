@@ -326,18 +326,17 @@ class HomePageController extends GetxController {
         debugPrint("Add Fund Response: $value");
 
         if (value['status'] == true && value['data'] != null) {
-          final data = value['data']; // ✅ THIS IS THE VARIABLE
+          final data = value['data'];
 
           // Save for later status check
           walletController.addFundID = data['paymentId'];
           walletController.paymentUrl = data['payment_url'];
           walletController.upiIntent = data['upi_intent'];
 
-          // ✅ YAHAN PAYMENT SCREEN OPEN HOGA
-          Get.to(() => PaymentScreen(
-            paymentUrl: data['payment_url'],
-            upiIntent: data['upi_intent'],
-          ));
+          // Get.to(() => PaymentScreen(
+          //   paymentUrl: data['payment_url'],
+          //   upiIntent: data['upi_intent'],
+          // ));
         } else {
           AppUtils.showErrorSnackBar(
             bodyText: value['message'] ?? "Payment failed",
