@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-
 import '../../Custom Controllers/wallet_controller.dart';
 import '../../components/bottumnavigation/bottumnavigation.dart';
 import '../../helper_files/app_colors.dart';
@@ -39,44 +38,67 @@ class _DashBoardPageState extends State<DashBoardPage> {
       children: [
         Scaffold(
           bottomNavigationBar: Obx(
-            () => MyNavigationBar(
+                () => MyNavigationBar(
               currentIndex: controller.currentIndex.value,
               onTapBidHistory: () {
                 controller.pageWidget.value = 1;
                 controller.currentIndex.value = 1;
                 walletController.selectedIndex.value = null;
                 controller.marketBidsByUserId(lazyLoad: false);
-                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.landscapeLeft
+                ]);
                 // controller.getUserBalance();
               },
               onTapHome: () {
                 controller.pageWidget.value = 0;
                 controller.currentIndex.value = 0;
                 walletController.selectedIndex.value = null;
-                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
-                // controller.getUserBalance();
-              },
-              onTapMore: () {
-                controller.pageWidget.value = 4;
-                controller.currentIndex.value = 4;
-                walletController.selectedIndex.value = null;
-                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.landscapeLeft
+                ]);
                 // controller.getUserBalance();
               },
               onTapWallet: () {
                 controller.pageWidget.value = 2;
                 controller.currentIndex.value = 2;
-                SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft]);
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.landscapeLeft
+                ]);
                 walletController.walletBalance.refresh();
                 controller.getUserBalance();
                 walletController.walletBalance.refresh();
               },
               onTapPassbook: () {
                 walletController.selectedIndex.value = null;
-                controller.getPassBookData(lazyLoad: false, offset: controller.offset.value.toString());
+                controller.getPassBookData(
+                    lazyLoad: false, offset: controller.offset.value.toString());
                 controller.pageWidget.value = 3;
                 controller.currentIndex.value = 3;
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.landscapeLeft
+                ]);
               },
+              onTapChat: () {
+                controller.pageWidget.value = 4;
+                controller.currentIndex.value = 4;
+                walletController.selectedIndex.value = null;
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.landscapeLeft
+                ]);
+              }, onTapMore: () {
+                controller.pageWidget.value = 5;
+                controller.currentIndex.value = 5;
+                walletController.selectedIndex.value = null;
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.landscapeLeft
+                ]);}
             ),
           ),
           backgroundColor: AppColors.white,
@@ -88,23 +110,27 @@ class _DashBoardPageState extends State<DashBoardPage> {
               }
             },
             child: Obx(
-              () => controller.getDashBoardPages(
+                  () => controller.getDashBoardPages(
                 controller.pageWidget.value,
                 size,
                 context,
-                notifictionCount: controller.getNotifiactionCount.value.toString(),
+                notifictionCount:
+                controller.getNotifiactionCount.value.toString(),
               ),
             ),
           ),
         ),
         Obx(
-          () => controller.getNotifiactionCount.value > 0 ? HomeScreenUtils().notificationAbout(context) : Container(),
+              () => controller.getNotifiactionCount.value > 0
+              ? HomeScreenUtils().notificationAbout(context)
+              : Container(),
         )
       ],
     );
   }
 
-  Padding onExitAlert(BuildContext context, {required Function() onExit, required Function() onCancel}) {
+  Padding onExitAlert(BuildContext context,
+      {required Function() onExit, required Function() onCancel}) {
     return Padding(
       padding: EdgeInsets.all(20.0),
       child: AlertDialog(
@@ -112,7 +138,8 @@ class _DashBoardPageState extends State<DashBoardPage> {
           'Exit App',
           style: CustomTextStyle.textRobotoSansBold,
         ),
-        content: Text('Are you sure you want to exit the app?', style: CustomTextStyle.textRobotoSansMedium),
+        content: Text('Are you sure you want to exit the app?',
+            style: CustomTextStyle.textRobotoSansMedium),
         actions: [
           TextButton(
             onPressed: onCancel,

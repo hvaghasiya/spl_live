@@ -13,6 +13,7 @@ class MyNavigationBar extends StatelessWidget {
   Function() onTapWallet;
   Function() onTapMore;
   Function() onTapPassbook;
+  Function() onTapChat;
 
   MyNavigationBar({
     super.key,
@@ -22,6 +23,7 @@ class MyNavigationBar extends StatelessWidget {
     required this.onTapMore,
     required this.onTapWallet,
     required this.onTapPassbook,
+    required this.onTapChat,
   });
 
   @override
@@ -78,7 +80,17 @@ class MyNavigationBar extends StatelessWidget {
             icon: ConstantImage.moreIcon,
             iconText: "More",
             textColor:
-                currentIndex == 4 ? AppColors.appbarColor : AppColors.black,
+                currentIndex == 5 ? AppColors.appbarColor : AppColors.black,
+            color: currentIndex == 5 ? AppColors.appbarColor : AppColors.black,
+          ),
+          AppUtils().nameIcons(
+            width: size.width * 0.2,
+            onTap: onTapChat,
+            icon: ConstantImage.moreIcon,
+
+            iconText: "Chat",
+            textColor:
+            currentIndex == 4 ? AppColors.appbarColor : AppColors.black,
             color: currentIndex == 4 ? AppColors.appbarColor : AppColors.black,
           ),
         ],

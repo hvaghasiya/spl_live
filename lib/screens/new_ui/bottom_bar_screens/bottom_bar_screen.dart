@@ -96,10 +96,10 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
             //   }
             // },
             onTap: (v) async {
-              // CHAT TAB → OPEN FRESHWORKS
-              if (v == 4) {
-                Freshchat.showConversations();
-                return;
+              homeCon.pageWidget.value = v;
+
+              if (homeCon.pageWidget.value == 2) {
+                walletCon.selectedIndex.value = null;
               }
 
               homeCon.pageWidget.value = v;

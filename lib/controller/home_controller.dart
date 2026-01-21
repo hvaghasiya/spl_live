@@ -4,6 +4,7 @@ import 'package:freshchat_sdk/freshchat_user.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import '../screens/new_ui/ChatWeb_view_screen.dart';
 
 import '../api_services/api_service.dart';
 import '../helper_files/constant_image.dart';
@@ -54,7 +55,7 @@ class HomeController extends GetxController {
       case 3:
         return const PassBook();
       case 4:
-        return const MoreOptions();
+        return const ChatWebViewScreen();
     }
   }
 
