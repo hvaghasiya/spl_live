@@ -47,7 +47,7 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
   final GlobalKey _qrKey = GlobalKey();
 
   Timer? _timer;
-  final ValueNotifier<int> _remainingSecondsNotifier = ValueNotifier<int>(239);
+  final ValueNotifier<int> _remainingSecondsNotifier = ValueNotifier<int>(179);
 
 
   @override
@@ -74,6 +74,9 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
           (Timer timer) {
         if (_remainingSecondsNotifier.value == 0) {
           timer.cancel();
+          if (mounted) {
+            Navigator.pop(context);
+          }
         } else {
           _remainingSecondsNotifier.value--;
         }
@@ -240,6 +243,38 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     );
   }
 
+  void _showQrSavedPopup() {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 60.sp),
+              SizedBox(height: 15.h),
+              Text(
+                "QR Saved to Gallery!",
+                style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 18.sp),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20.h),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.appbarColor),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK", style: TextStyle(color: Colors.white)),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _launchUPI(String? url, {bool isPaytm = false, bool isPhonePe = false}) async {
 
 
@@ -325,7 +360,8 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
           imageBytes,
           name: "SPL_QR_${DateTime.now().millisecondsSinceEpoch}",
         );
-        AppUtils.showSuccessSnackBar(bodyText: "QR Saved to Gallery! ✅");
+        _showQrSavedPopup();
+        // AppUtils.showSuccessSnackBar(bodyText: "QR Saved to Gallery! ✅");
       } else {
         AppUtils.showErrorSnackBar(bodyText: "Failed to generate QR image.");
       }

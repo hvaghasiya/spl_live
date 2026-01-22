@@ -155,6 +155,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
         }
       },
       child: Material(
+        color: AppColors.white,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
@@ -184,7 +185,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                           alignment: Alignment.bottomLeft,
                           children: [
                             AspectRatio(
-                              aspectRatio: 11 / 5.0,
+                              aspectRatio: 10 / 5.5,
                               child: PromoVideoPlayer(
                                 videoUrl: promotionalVideoLink,
                                 isAutoPlay: false,
@@ -212,7 +213,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      Colors.black.withOpacity(0.8),
+                                      Colors.black.withOpacity(0.9),
                                       Colors.transparent,
                                     ],
                                   ),

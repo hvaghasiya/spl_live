@@ -50,7 +50,7 @@ class _SPLWalletState extends State<SPLWallet> {
                 ),
                 Obx(
                   () => controller.selectedIndex.value != null
-                      ? currentWidget(controller.selectedIndex.value)
+                      ? Expanded(child: currentWidget(controller.selectedIndex.value))
                       : Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
