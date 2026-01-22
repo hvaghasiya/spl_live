@@ -46,18 +46,39 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
   bool _isLoading = false;
   final GlobalKey _qrKey = GlobalKey();
 
+  Timer? _timer;
+  final ValueNotifier<int> _remainingSecondsNotifier = ValueNotifier<int>(239);
+
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _listenDeepLinks();
+    _startTimer();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _linkSub?.cancel();
+    _timer?.cancel();
+    _remainingSecondsNotifier.dispose();
     super.dispose();
+  }
+
+  void _startTimer() {
+    const oneSec = Duration(seconds: 1);
+    _timer = Timer.periodic(
+      oneSec,
+          (Timer timer) {
+        if (_remainingSecondsNotifier.value == 0) {
+          timer.cancel();
+        } else {
+          _remainingSecondsNotifier.value--;
+        }
+      },
+    );
   }
 
   @override
@@ -133,7 +154,7 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
         } else if (status == 'failed') {
           AppUtils.showErrorSnackBar(bodyText: "Payment Failed ❌");
         } else {
-          AppUtils.showErrorSnackBar(bodyText: "Status: $status. Waiting...");
+          _showPendingPopup(status);
         }
       } else {
         AppUtils.showErrorSnackBar(bodyText: "Could not verify status.");
@@ -150,6 +171,39 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     AppUtils.hideProgressDialog();
     if(mounted) setState(() => _isLoading = false);
     AppUtils.showErrorSnackBar(bodyText: msg);
+  }
+
+  void _showPendingPopup(String status) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.info_outline, color: Colors.orange, size: 60.sp),
+              SizedBox(height: 15.h),
+              Text(
+                "Payment Status: $status",
+                style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 18.sp),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10.h),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.appbarColor),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("OK", style: TextStyle(color: Colors.white)),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _showSuccessPopup() {
@@ -378,6 +432,25 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
                         ? QrImageView(data: paymentUrl, version: QrVersions.auto, size: 180.w)
                         : Icon(Icons.broken_image, color: Colors.red, size: 40),
                   ),
+                ),
+
+                SizedBox(height: 15.h),
+                ValueListenableBuilder<int>(
+                  valueListenable: _remainingSecondsNotifier,
+                  builder: (context, remainingSeconds, child) {
+                    int minutes = remainingSeconds ~/ 60;
+                    int seconds = remainingSeconds % 60;
+                    String timerText = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+
+                    return Text(
+                      "QR Expires in: $timerText",
+                      style: CustomTextStyle.textRobotoMedium.copyWith(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.redAccent,
+                      ),
+                    );
+                  },
                 ),
 
                 SizedBox(height: 15.h),

@@ -387,55 +387,55 @@ import '../../helper_files/custom_text_style.dart';
                 ),
 
                 SizedBox(height: Get.height * 0.0001),
-                Divider(endIndent: 20, indent: 20, color: AppColors.black),
-                const SizedBox(height: 10),
-                Text(
-                  "Pay using any UPI app",
-                  style: CustomTextStyle.textRobotoMedium.copyWith(
-                    fontSize: 16,
-                    color: AppColors.black,
-                  ),
-                ),
-                SizedBox(height: 0.2.h),
-                Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: Image.asset(ConstantImage.gPay, height: 44, width: 44),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: Image.asset(ConstantImage.paytm, height: 44, width: 44),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: Image.asset(ConstantImage.amazon, height: 44, width: 44),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: Image.asset(ConstantImage.phonepay, height: 44, width: 44),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: Image.asset(ConstantImage.icici_bank, height: 44, width: 44),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 1.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10.0),
-                      child: Image.asset(ConstantImage.bhim),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10.0),
-                      child: Image.asset(ConstantImage.upi),
-                    ),
-                  ],
-                )
+                // Divider(endIndent: 20, indent: 20, color: AppColors.black),
+                // const SizedBox(height: 10),
+                // Text(
+                //   "Pay using any UPI app",
+                //   style: CustomTextStyle.textRobotoMedium.copyWith(
+                //     fontSize: 16,
+                //     color: AppColors.black,
+                //   ),
+                // ),
+                // SizedBox(height: 0.2.h),
+                // Wrap(
+                //   alignment: WrapAlignment.spaceBetween,
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 15.0),
+                //       child: Image.asset(ConstantImage.gPay, height: 44, width: 44),
+                //     ),
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 15.0),
+                //       child: Image.asset(ConstantImage.paytm, height: 44, width: 44),
+                //     ),
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 15.0),
+                //       child: Image.asset(ConstantImage.amazon, height: 44, width: 44),
+                //     ),
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 15.0),
+                //       child: Image.asset(ConstantImage.phonepay, height: 44, width: 44),
+                //     ),
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 15.0),
+                //       child: Image.asset(ConstantImage.icici_bank, height: 44, width: 44),
+                //     ),
+                //   ],
+                // ),
+                // SizedBox(height: 1.h),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 10.0),
+                //       child: Image.asset(ConstantImage.bhim),
+                //     ),
+                //     Padding(
+                //       padding: const EdgeInsets.only(right: 10.0),
+                //       child: Image.asset(ConstantImage.upi),
+                //     ),
+                //   ],
+                // )
               ],
             ),
           ),
