@@ -7,11 +7,13 @@ import '../helper_files/app_colors.dart';
 class PromoVideoPlayer extends StatefulWidget {
   final String videoUrl;
   final bool isAutoPlay;
+  final Function(bool isPlaying)? onPlayStateChanged;
 
   const PromoVideoPlayer({
     super.key,
     required this.videoUrl,
     this.isAutoPlay = false,
+    this.onPlayStateChanged,
   });
 
   @override
@@ -26,6 +28,8 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
   bool _isYoutube = false;
   bool _isLoading = true;
   bool _isError = false;
+
+  bool _lastKnownState = false;
 
   @override
   void initState() {
@@ -61,10 +65,21 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
           isLive: false,
           forceHD: false,
         ),
-      );
+      )..addListener(_youtubeListener);
       if (mounted) setState(() => _isLoading = false);
     } else {
       if (mounted) setState(() => _isError = true);
+    }
+  }
+
+  void _youtubeListener() {
+    if (_youtubeController != null && widget.onPlayStateChanged != null) {
+      bool isPlaying = _youtubeController!.value.isPlaying;
+      // Sirf tab notify karo jab state change ho (Play se Pause ya vice versa)
+      if (isPlaying != _lastKnownState) {
+        _lastKnownState = isPlaying;
+        widget.onPlayStateChanged!(isPlaying);
+      }
     }
   }
 
@@ -72,6 +87,8 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
     try {
       _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
       await _videoPlayerController!.initialize();
+
+      _videoPlayerController!.addListener(_videoListener);
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController!,
@@ -99,8 +116,19 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
     }
   }
 
+  void _videoListener() {
+    if (_videoPlayerController != null && widget.onPlayStateChanged != null) {
+      bool isPlaying = _videoPlayerController!.value.isPlaying;
+      if (isPlaying != _lastKnownState) {
+        _lastKnownState = isPlaying;
+        widget.onPlayStateChanged!(isPlaying);
+      }
+    }
+  }
+
   @override
   void dispose() {
+    _videoPlayerController?.removeListener(_videoListener);
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
     _youtubeController?.dispose();
