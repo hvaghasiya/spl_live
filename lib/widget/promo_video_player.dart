@@ -28,7 +28,6 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
   bool _isYoutube = false;
   bool _isLoading = true;
   bool _isError = false;
-
   bool _lastKnownState = false;
 
   @override
@@ -47,7 +46,8 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
         widget.videoUrl.toLowerCase().contains("youtu.be")) {
       _isYoutube = true;
       _initializeYoutubePlayer();
-    } else {
+    }
+    else {
       _isYoutube = false;
       await _initializeNormalPlayer();
     }
@@ -84,18 +84,22 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
 
   Future<void> _initializeNormalPlayer() async {
     try {
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
-      await _videoPlayerController!.initialize();
+      if (widget.videoUrl.startsWith("http") || widget.videoUrl.startsWith("https")) {
+        _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+      } else {
+        _videoPlayerController = VideoPlayerController.asset(widget.videoUrl);
+      }
 
+      await _videoPlayerController!.initialize();
       _videoPlayerController!.addListener(_videoListener);
 
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController!,
         autoPlay: widget.isAutoPlay,
         looping: false,
-        aspectRatio: 14 / 7,
+        aspectRatio: _videoPlayerController!.value.aspectRatio,
         errorBuilder: (context, errorMessage) {
-          return const Center(child: Text("Video Error", style: TextStyle(color: Colors.white)));
+          return const Center(child: Text("video Error", style: TextStyle(color: Colors.white)));
         },
         materialProgressColors: ChewieProgressColors(
           playedColor: AppColors.appbarColor,
@@ -111,6 +115,7 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
 
       if (mounted) setState(() => _isLoading = false);
     } catch (e) {
+      debugPrint("video Error: $e");
       if (mounted) setState(() => _isError = true);
     }
   }
@@ -140,7 +145,7 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
       return Container(
         color: Colors.black,
         alignment: Alignment.center,
-        child: const Text("Video Unavailable", style: TextStyle(color: Colors.white)),
+        child: const Text("video Unavailable", style: TextStyle(color: Colors.white)),
       );
     }
 
@@ -158,12 +163,13 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
         child: YoutubePlayer(
           controller: _youtubeController!,
           showVideoProgressIndicator: true,
-        progressIndicatorColor: AppColors.appbarColor,
-        progressColors: ProgressBarColors(
-          playedColor: AppColors.appbarColor,
-          handleColor: AppColors.appbarColor,
+          progressIndicatorColor: AppColors.appbarColor,
+          progressColors: ProgressBarColors(
+            playedColor: AppColors.appbarColor,
+            handleColor: AppColors.appbarColor,
+          ),
         ),
-      ));
+      );
     }
 
     if (!_isYoutube && _chewieController != null) {
@@ -173,6 +179,3 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
     return const SizedBox.shrink();
   }
 }
-
-
-

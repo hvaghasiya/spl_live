@@ -78,4 +78,9 @@ class ConstantImage {
   static String market_result = "assets/images/market_result.svg";
   static String starline_bid_history = "assets/images/starline_bid_history.svg";
   static String starline_res_history = "assets/images/starline_res_history.svg";
+
+
+  static String video = "assets/video/video.mp4";
+
+
 }
