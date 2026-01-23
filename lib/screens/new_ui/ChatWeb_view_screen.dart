@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../../helper_files/app_colors.dart';
 import '../../helper_files/constant_variables.dart';
 import '../../models/commun_models/user_details_model.dart';
-
-// Add these two imports
-import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ChatWebViewScreen extends StatefulWidget {
   const ChatWebViewScreen({super.key});
@@ -17,13 +16,21 @@ class ChatWebViewScreen extends StatefulWidget {
 }
 
 class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
-  late final WebViewController _controller;
+  static WebViewController? _cachedController;
   bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
+    if (_cachedController == null) {
+      _initWebViewController();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
+  Future<void> _initWebViewController() async {
     String userName = "Guest";
     String userId = "";
     String userPhone = "";
@@ -35,14 +42,14 @@ class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
 
       if (storedData != null) {
         UserDetailsModel user = UserDetailsModel.fromJson(storedData);
-
         userName = user.userName ?? user.fullName ?? "User";
         userId = user.id.toString();
         userPhone = user.phoneNumber ?? "";
       }
     } catch (e) {
-      print("Error fetching user data: $e");
+      debugPrint("Error fetching user data: $e");
     }
+
 
     final String htmlContent = '''
       <!DOCTYPE html>
@@ -60,21 +67,44 @@ class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
            }
            #fc_frame, iframe {
              position: absolute !important;
-        top: -29px !important; 
-            height: calc(100% + 40px) !important; 
+             top: 0 !important; 
+             height: 100% !important; 
              width: 100% !important;
              margin: 0 !important;
              box-shadow: none !important; 
              border-radius: 0 !important;
-             z-index: 9999 !important;
+             z-index: 999 !important;
            }
            .fc-launcher-ring, .fc-launcher-ring-container { 
               display: none !important;
+           }
+           #custom-back-btn {
+             position: fixed;
+             top: 12px;
+             right: 9px;
+             z-index: 100000;
+             background-color: #ffa71e;
+             color: #ffa71e;
+             border: none;
+             border-radius: 10%;
+             width: 55px;
+             height: 50px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+            
+             cursor: pointer;
            }
         </style>
       </head>
       <body>
       
+      <button id="custom-back-btn" onclick="goBackToMenu()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
       <script 
           src='https://in.fw-cdn.com/32681001/1502620.js' 
           chat='true' 
@@ -82,6 +112,12 @@ class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
         </script>
         
         <script>
+          function goBackToMenu() {
+            if (window.fcWidget) {
+              window.fcWidget.showTopics();
+            }
+          }
+
           var interval = setInterval(function() {
             if (window.fcWidget) {
               clearInterval(interval);
@@ -115,9 +151,8 @@ class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
                 email: userData.email,
                 externalId: userData.externalId
               });
-
               window.fcWidget.open();
-              
+             
               window.fcWidget.on('widget:closed', function() {
                 window.fcWidget.open();
               });
@@ -127,7 +162,8 @@ class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
       </body>
       </html>
     ''';
-    _controller = WebViewController()
+
+    final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFFFFFFFF))
       ..setNavigationDelegate(
@@ -142,28 +178,24 @@ class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
         ),
       );
 
-    if (_controller.platform is AndroidWebViewController) {
+    if (controller.platform is AndroidWebViewController) {
       final AndroidWebViewController androidController =
-          _controller.platform as AndroidWebViewController;
+      controller.platform as AndroidWebViewController;
       androidController.setMediaPlaybackRequiresUserGesture(false);
-      androidController
-          .setOnShowFileSelector((FileSelectorParams params) async {
+      androidController.setOnShowFileSelector((FileSelectorParams params) async {
         final picker = ImagePicker();
         XFile? file;
         try {
           file = await picker.pickImage(source: ImageSource.gallery);
         } catch (e) {
-          print("Error picking file: $e");
+          debugPrint("Error picking file: $e");
         }
-
-        if (file == null) {
-          return [];
-        }
-        return [Uri.file(file.path).toString()];
+        return file == null ? [] : [Uri.file(file.path).toString()];
       });
     }
-    _controller.loadHtmlString(htmlContent,
-        baseUrl: "https://wchat.in.freshchat.com");
+
+    controller.loadHtmlString(htmlContent, baseUrl: "https://wchat.in.freshchat.com");
+    _cachedController = controller;
   }
 
   @override
@@ -181,8 +213,11 @@ class _ChatWebViewScreenState extends State<ChatWebViewScreen> {
       ),
       body: Stack(
         children: [
-          WebViewWidget(controller: _controller),
-          if (isLoading) const Center(child: CircularProgressIndicator()),
+          if (_cachedController != null)
+            WebViewWidget(controller: _cachedController!),
+
+          if (isLoading || _cachedController == null)
+            const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
