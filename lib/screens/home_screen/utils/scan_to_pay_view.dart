@@ -278,6 +278,46 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     );
   }
 
+  Future<bool> _showExitConfirmationDialog() async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+        backgroundColor: Colors.white,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cancel, color: AppColors.appbarColor, size: 60.sp),
+            SizedBox(height: 15.h),
+            Text("Cancel Payment?", style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+            Text(
+              "Are you sure you want to cancel?",
+              style: TextStyle(fontSize: 16.sp),
+            ),
+          ],
+        ),
+        actions: [
+
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("NO", style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Container(
+                width: 50.w,
+                height: 30.h,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.appbarColor,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),child: const Text("YES", style: TextStyle(color: Colors.white))),
+          ),
+        ],
+      ),
+    ) ?? false;
+  }
+
   void _showSuccessPopup() {
     if (!mounted) return;
     if (ModalRoute.of(context)?.isCurrent != true) return;
@@ -468,126 +508,136 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
 
     final String paymentUrl = widget.paymentData?['payment_url'] ?? "";
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Complete Payment"),
-        centerTitle: true,
-        backgroundColor: AppColors.appbarColor,
-        foregroundColor: Colors.white,
-      ),
-      backgroundColor: AppColors.white,
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
-          child: Container(
-            padding: EdgeInsets.all(11.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Amount
-                Container(
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.withOpacity(0.5)),
-                    borderRadius: BorderRadius.circular(8.r),
-                    color: Colors.grey[50],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final bool shouldPop = await _showExitConfirmationDialog();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Complete Payment"),
+          centerTitle: true,
+          backgroundColor: AppColors.appbarColor,
+          foregroundColor: Colors.white,
+        ),
+        backgroundColor: AppColors.white,
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
+            child: Container(
+              padding: EdgeInsets.all(11.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4.r),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Amount
+                  Container(
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                      borderRadius: BorderRadius.circular(8.r),
+                      color: Colors.grey[50],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("₹${widget.amount}", style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 16.sp)),
+                        InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: widget.amount));
+                            AppUtils.showErrorSnackBar(bodyText: "Amount copied!");
+                          },
+                          child: Icon(Icons.copy, size: 20.sp, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("₹${widget.amount}", style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 16.sp)),
-                      InkWell(
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(text: widget.amount));
-                          AppUtils.showErrorSnackBar(bodyText: "Amount copied!");
-                        },
-                        child: Icon(Icons.copy, size: 20.sp, color: Colors.grey),
+                  SizedBox(height: 15.h),
+
+                  Text("SCAN QR TO PAY", style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10.h),
+
+                  RepaintBoundary(
+                    key: _qrKey,
+                    child: Container(
+                      height: 180.w, width: 180.w,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: Colors.grey.shade200),
                       ),
+                      child: (_decodedQrImage != null)
+                          ? Image.memory(_decodedQrImage!, fit: BoxFit.contain)
+                          : (paymentUrl.isNotEmpty)
+                          ? QrImageView(data: paymentUrl, version: QrVersions.auto, size: 180.w)
+                          : Icon(Icons.broken_image, color: Colors.red, size: 40),
+                    ),
+                  ),
+
+                  SizedBox(height: 15.h),
+                  ValueListenableBuilder<int>(
+                    valueListenable: _remainingSecondsNotifier,
+                    builder: (context, remainingSeconds, child) {
+                      int minutes = remainingSeconds ~/ 60;
+                      int seconds = remainingSeconds % 60;
+                      String timerText = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+
+                      return Text(
+                        "QR Expires in: $timerText",
+                        style: CustomTextStyle.textRobotoMedium.copyWith(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.redAccent,
+                        ),
+                      );
+                    },
+                  ),
+
+                  SizedBox(height: 15.h),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 45.h,
+                    child: OutlinedButton.icon(
+                      onPressed: _saveQrToGallery,
+                      icon: const Icon(Icons.download_rounded),
+                      label: const Text("Save QR to Gallery"),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.appbarColor,
+                        side: BorderSide(color: AppColors.appbarColor),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15.h),
+
+                  Row(
+                    children: [
+                      Expanded(child: InkWell(onTap: () => _launchUPI(paytmLink, isPaytm: true), child: _buildPaymentButton(assetName: ConstantImage.paytm, label: "PayTM"))),
+                      SizedBox(width: 15.w),
+                      // GPay shares QR
+                      Expanded(child: InkWell(onTap: () => _shareQrImage(), child: _buildPaymentButton(assetName: ConstantImage.gPay, label: "GPay"))),
                     ],
                   ),
-                ),
-                SizedBox(height: 15.h),
+                  SizedBox(height: 10.h),
+                  Row(
+                    children: [
 
-                Text("SCAN QR TO PAY", style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                SizedBox(height: 10.h),
-
-                RepaintBoundary(
-                  key: _qrKey,
-                  child: Container(
-                    height: 180.w, width: 180.w,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: (_decodedQrImage != null)
-                        ? Image.memory(_decodedQrImage!, fit: BoxFit.contain)
-                        : (paymentUrl.isNotEmpty)
-                        ? QrImageView(data: paymentUrl, version: QrVersions.auto, size: 180.w)
-                        : Icon(Icons.broken_image, color: Colors.red, size: 40),
+                      Expanded(child: InkWell(onTap: () async{await _saveQrToGallery(); _launchUPI(null, isPhonePe: true); }, child: _buildPaymentButton(assetName: ConstantImage.phonepay, label: "PhonePe"))),
+                    ],
                   ),
-                ),
-
-                SizedBox(height: 15.h),
-                ValueListenableBuilder<int>(
-                  valueListenable: _remainingSecondsNotifier,
-                  builder: (context, remainingSeconds, child) {
-                    int minutes = remainingSeconds ~/ 60;
-                    int seconds = remainingSeconds % 60;
-                    String timerText = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-
-                    return Text(
-                      "QR Expires in: $timerText",
-                      style: CustomTextStyle.textRobotoMedium.copyWith(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.redAccent,
-                      ),
-                    );
-                  },
-                ),
-
-                SizedBox(height: 15.h),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 45.h,
-                  child: OutlinedButton.icon(
-                    onPressed: _saveQrToGallery,
-                    icon: const Icon(Icons.download_rounded),
-                    label: const Text("Save QR to Gallery"),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.appbarColor,
-                      side: BorderSide(color: AppColors.appbarColor),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 15.h),
-
-                Row(
-                  children: [
-                    Expanded(child: InkWell(onTap: () => _launchUPI(paytmLink, isPaytm: true), child: _buildPaymentButton(assetName: ConstantImage.paytm, label: "PayTM"))),
-                    SizedBox(width: 15.w),
-                    // GPay shares QR
-                    Expanded(child: InkWell(onTap: () => _shareQrImage(), child: _buildPaymentButton(assetName: ConstantImage.gPay, label: "GPay"))),
-                  ],
-                ),
-                SizedBox(height: 10.h),
-                Row(
-                  children: [
-
-                    Expanded(child: InkWell(onTap: () async{await _saveQrToGallery(); _launchUPI(null, isPhonePe: true); }, child: _buildPaymentButton(assetName: ConstantImage.phonepay, label: "PhonePe"))),
-                  ],
-                ),
-                SizedBox(height: 20.h),
-              ],
+                  SizedBox(height: 20.h),
+                ],
+              ),
             ),
           ),
         ),

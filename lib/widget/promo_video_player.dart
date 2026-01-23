@@ -75,7 +75,6 @@ class _PromoVideoPlayerState extends State<PromoVideoPlayer> {
   void _youtubeListener() {
     if (_youtubeController != null && widget.onPlayStateChanged != null) {
       bool isPlaying = _youtubeController!.value.isPlaying;
-      // Sirf tab notify karo jab state change ho (Play se Pause ya vice versa)
       if (isPlaying != _lastKnownState) {
         _lastKnownState = isPlaying;
         widget.onPlayStateChanged!(isPlaying);
