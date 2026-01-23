@@ -49,13 +49,26 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
   Timer? _timer;
   final ValueNotifier<int> _remainingSecondsNotifier = ValueNotifier<int>(179);
 
+  Uint8List? _decodedQrImage;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _decodeQrImageOnce();
     _listenDeepLinks();
     _startTimer();
+  }
+
+  void _decodeQrImageOnce() {
+    final String? qrBase64 = widget.paymentData?['qrImageBase64'];
+    if (qrBase64 != null && qrBase64.isNotEmpty) {
+      try {
+        _decodedQrImage = base64Decode(qrBase64);
+      } catch (e) {
+        debugPrint("Error decoding QR: $e");
+      }
+    }
   }
 
   @override
@@ -74,12 +87,62 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
           (Timer timer) {
         if (_remainingSecondsNotifier.value == 0) {
           timer.cancel();
-          if (mounted) {
-            Navigator.pop(context);
-          }
+          _showExpiredDialog();
+          // if (mounted) {
+          //   Navigator.pop(context);
+          // }
         } else {
           _remainingSecondsNotifier.value--;
+          if (_remainingSecondsNotifier.value % 2 == 0) {
+            _checkPaymentStatus(silent: true);
+          }
         }
+      },
+    );
+  }
+
+  void _showExpiredDialog() {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+
+        Future.delayed(const Duration(seconds: 2), () {
+          if (Navigator.of(dialogContext).canPop()) {
+            Navigator.of(dialogContext).pop();
+
+            if (mounted) {
+              Navigator.of(context).pop();
+            }
+          }
+        });
+
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+            backgroundColor: Colors.white,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.timer_off_outlined, color: Colors.redAccent, size: 60.sp),
+                SizedBox(height: 15.h),
+                Text(
+                  "QR Expired!",
+                  style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 5.h),
+                Text(
+                  "Please Try Again!",
+                  style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
@@ -118,11 +181,15 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     }
   }
 
-  Future<void> _checkPaymentStatus({Map<String, String>? forceIds}) async {
+  Future<void> _checkPaymentStatus({Map<String, String>? forceIds, bool silent = false}) async {
     if (_isLoading) return;
     if(mounted) {
-      setState(() => _isLoading = true);
-      AppUtils.showProgressDialog(isCancellable: false);
+      if (!silent) {
+        setState(() => _isLoading = true);
+        AppUtils.showProgressDialog(isCancellable: false);
+      } else {
+        _isLoading = true; // Still mark as loading but don't call setState to avoid rebuilds
+      }
     }
 
     try {
@@ -139,7 +206,7 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
       }
 
       if (orderId.isEmpty) {
-        _handleError("Order ID missing");
+        if (!silent) _handleError("Order ID missing");
         return;
       }
 
@@ -148,25 +215,27 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
         orderId: orderId,
       );
 
-      AppUtils.hideProgressDialog();
+      if (!silent) AppUtils.hideProgressDialog();
 
       if (res != null && res['status'] == true) {
         final String status = res['data']['status'].toString().toLowerCase();
         if (status == 'success') {
+          _timer?.cancel();
           _showSuccessPopup();
         } else if (status == 'failed') {
-          AppUtils.showErrorSnackBar(bodyText: "Payment Failed ❌");
+          if (!silent) AppUtils.showErrorSnackBar(bodyText: "Payment Failed ❌");
         } else {
-          _showPendingPopup(status);
+          if (!silent) _showPendingPopup(status);
         }
       } else {
-        AppUtils.showErrorSnackBar(bodyText: "Could not verify status.");
+        if (!silent) AppUtils.showErrorSnackBar(bodyText: "Could not verify status.");
       }
 
     } catch (e) {
-      AppUtils.hideProgressDialog();
+      if (!silent) AppUtils.hideProgressDialog();
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      _isLoading = false;
+      if (mounted && !silent) setState(() {});
     }
   }
 
@@ -247,7 +316,13 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     if (!mounted) return;
     showDialog(
       context: context,
-      builder: (context) {
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (Navigator.of(dialogContext).canPop()) {
+            Navigator.of(dialogContext).pop();
+          }
+        });
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
           content: Column(
@@ -260,14 +335,6 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
                 style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 18.sp),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20.h),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.appbarColor),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("OK", style: TextStyle(color: Colors.white)),
-              )
             ],
           ),
         );
@@ -376,10 +443,8 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
   }
 
   Future<Uint8List?> _captureQrImage() async {
-    final String? qrBase64 = widget.paymentData?['qrImageBase64'];
-
-    if (qrBase64 != null && qrBase64.isNotEmpty) {
-      return base64Decode(qrBase64);
+    if (_decodedQrImage != null) {
+      return _decodedQrImage;
     } else {
       RenderRepaintBoundary? boundary = _qrKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if(boundary == null) {
@@ -401,7 +466,6 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     final upiIntents = widget.paymentData?['upi_intent'] ?? {};
     final paytmLink = upiIntents['paytm_link'] ?? upiIntents['bhim_link'];
 
-    final String? qrBase64 = widget.paymentData?['qrImageBase64'];
     final String paymentUrl = widget.paymentData?['payment_url'] ?? "";
 
     return Scaffold(
@@ -462,8 +526,8 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(color: Colors.grey.shade200),
                     ),
-                    child: (qrBase64 != null && qrBase64.isNotEmpty)
-                        ? Image.memory(base64Decode(qrBase64), fit: BoxFit.contain)
+                    child: (_decodedQrImage != null)
+                        ? Image.memory(_decodedQrImage!, fit: BoxFit.contain)
                         : (paymentUrl.isNotEmpty)
                         ? QrImageView(data: paymentUrl, version: QrVersions.auto, size: 180.w)
                         : Icon(Icons.broken_image, color: Colors.red, size: 40),
@@ -506,25 +570,6 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
                   ),
                 ),
                 SizedBox(height: 15.h),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 45.h,
-                  child: ElevatedButton.icon(
-                    onPressed: _isLoading ? null : () => _checkPaymentStatus(),
-                    icon: _isLoading
-                        ? SizedBox(width: 20.w, height: 20.w, child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.refresh),
-                    label: Text(_isLoading ? "Checking..." : "Check Payment Status"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.h),
-
 
                 Row(
                   children: [

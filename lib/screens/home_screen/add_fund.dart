@@ -52,6 +52,13 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  void _clearInputs() {
+    homeCon.addFundCon.clear();
+    for (var element in homeCon.newTicketsList) {
+      element.isSelected.value = false;
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -70,6 +77,68 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
         break;
       default:
     }
+  }
+
+
+  void _showStatusDialog({
+    required String title,
+    required String message,
+    required IconData icon,
+    required Color color,
+  }) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.r)),
+          backgroundColor: Colors.white,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 60.sp),
+              SizedBox(height: 15.h),
+              Text(
+                title,
+                style: CustomTextStyle.textRobotoMedium.copyWith(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 5.h),
+              Text(
+                message,
+                style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.appbarColor,
+                  minimumSize: Size(100.w, 30.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                },
+                child: const Text(
+                  "OK",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> processPayment(String amount) async {
@@ -109,7 +178,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
 
         if (jsonResponse['status'] == true) {
           final paymentData = jsonResponse['data'];
-
+          _clearInputs();
           Get.to(() => ScanToPayScreen(
                 amount: amount,
                 payeeName: "SKYLINE TRADERS",
@@ -145,6 +214,7 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
     return PopScope(
       canPop: false,
       onPopInvoked: (value) async {
+        _clearInputs();
         if (value) {
           return;
         }
@@ -154,9 +224,10 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
           Get.back();
         }
       },
-      child: Material(
-        color: AppColors.white,
-        child: SingleChildScrollView(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: AppColors.white,
+        body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
@@ -202,40 +273,40 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                               ),
                             ),
                             if (!isVideoPlaying)
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                padding: EdgeInsets.all(19.w),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [
-                                      Colors.black.withOpacity(0.9),
-                                      Colors.transparent,
-                                    ],
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: EdgeInsets.all(19.w),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                      colors: [
+                                        Colors.black.withOpacity(0.9),
+                                        Colors.transparent,
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                child: Text(
-                                  "How to Add Funds",
-                                  style:
-                                      CustomTextStyle.textRobotoMedium.copyWith(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    shadows: [
-                                      Shadow(
-                                        offset: const Offset(0, 1),
-                                        blurRadius: 10.0,
-                                        color: Colors.black,
-                                      ),
-                                    ],
+                                  child: Text(
+                                    "How to Add Funds",
+                                    style: CustomTextStyle.textRobotoMedium
+                                        .copyWith(
+                                      fontSize: 20.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          offset: const Offset(0, 1),
+                                          blurRadius: 10.0,
+                                          color: Colors.black,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),
@@ -399,16 +470,28 @@ class _AddFundState extends State<AddFund> with WidgetsBindingObserver {
                         textStyle: CustomTextStyle.textRobotoMedium,
                         onTap: () async {
                           if (homeCon.addFundCon.text.isEmpty) {
-                            AppUtils.showErrorSnackBar(
-                                bodyText: "Please enter amount");
+                            // AppUtils.showErrorSnackBar(
+                            //     bodyText: "Please enter amount");
+                            _showStatusDialog(
+                              title: "Input Required",
+                              message: "Please enter amount",
+                              icon: Icons.warning_amber_rounded,
+                              color: Colors.orange,
+                            );
                           } else {
                             int enteredAmount =
                                 int.tryParse(homeCon.addFundCon.text) ?? 0;
 
-                            if (enteredAmount < 100) {
-                              AppUtils.showErrorSnackBar(
-                                  bodyText:
-                                      "Please add minimum amount of ₹ 100");
+                            if (enteredAmount < 200) {
+                              // AppUtils.showErrorSnackBar(
+                              //     bodyText:
+                              //         "Please add minimum amount of ₹ 200");
+                              _showStatusDialog(
+                                title: "Minimum Amount",
+                                message: "Please add minimum amount of ₹ 200",
+                                icon: Icons.currency_rupee,
+                                color: AppColors.appbarColor,
+                              );
                             } else {
                               FocusScope.of(context).unfocus();
 
