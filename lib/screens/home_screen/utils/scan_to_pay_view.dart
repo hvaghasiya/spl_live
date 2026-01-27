@@ -382,6 +382,37 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     );
   }
 
+  void PhonepePopup() {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (Navigator.of(dialogContext).canPop()) {
+            Navigator.of(dialogContext).pop();
+          }
+        });
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.cancel, color: Colors.red, size: 60.sp),
+              SizedBox(height: 15.h),
+              Text(
+                "PhonePe Is Not Installed!",
+                style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 18.sp),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
   Future<void> _launchUPI(String? url, {bool isPaytm = false, bool isPhonePe = false}) async {
 
 
@@ -390,7 +421,7 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
 
       final bool installed = await canLaunchUrl(phonePeUri);
       if (!installed) {
-        AppUtils.showErrorSnackBar(bodyText: "PhonePe app not installed");
+        PhonepePopup();
         return;
       }
 
@@ -550,13 +581,13 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("₹${widget.amount}", style: CustomTextStyle.textRobotoMedium.copyWith(fontSize: 16.sp)),
-                        InkWell(
-                          onTap: () {
-                            Clipboard.setData(ClipboardData(text: widget.amount));
-                            AppUtils.showErrorSnackBar(bodyText: "Amount copied!");
-                          },
-                          child: Icon(Icons.copy, size: 20.sp, color: Colors.grey),
-                        ),
+                        // InkWell(
+                        //   onTap: () {
+                        //     // Clipboard.setData(ClipboardData(text: widget.amount));
+                        //     // AppUtils.showErrorSnackBar(bodyText: "Amount copied!");
+                        //   },
+                        //   child: Icon(Icons.copy, size: 20.sp, color: Colors.grey),
+                        // ),
                       ],
                     ),
                   ),
