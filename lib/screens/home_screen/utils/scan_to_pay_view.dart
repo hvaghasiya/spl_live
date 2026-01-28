@@ -39,6 +39,12 @@ class ScanToPayScreen extends StatefulWidget {
 }
 
 class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingObserver {
+  bool _isStatusDialogVisible = false;
+  Timer? _statusPollingTimer;
+  int _pollAttempt = 0;
+
+  static const int _maxPollAttempts = 20;
+  static const Duration _pollInterval = Duration(seconds: 5);
   late final AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSub;
 
@@ -60,6 +66,81 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
     _startTimer();
   }
 
+  void _showCheckingStatusDialog() {
+    if (!mounted || _isStatusDialogVisible) return;
+
+    _isStatusDialogVisible = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.r),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                SizedBox(height: 15.h),
+                Text(
+                  "Checking payment status…",
+                  style: CustomTextStyle.textRobotoMedium.copyWith(
+                    fontSize: 16.sp,
+                  ),
+                ),
+                SizedBox(height: 5.h),
+                Text(
+                  "Please wait, do not press back",
+                  style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  void _hideCheckingStatusDialog() {
+    if (!_isStatusDialogVisible) return;
+
+    _isStatusDialogVisible = false;
+
+    if (Navigator.of(context, rootNavigator: true).canPop()) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
+
+
+
+  void _startStatusPolling() {
+    _statusPollingTimer?.cancel();
+    _showCheckingStatusDialog();
+    _pollAttempt = 0;
+
+    _statusPollingTimer = Timer.periodic(_pollInterval, (timer) async {
+      if (_pollAttempt >= _maxPollAttempts) {
+        timer.cancel();
+        debugPrint("⛔ Polling stopped (max attempts reached)");
+        return;
+      }
+
+      _pollAttempt++;
+      debugPrint("🔁 Poll attempt $_pollAttempt");
+
+      await _checkPaymentStatus(silent: true);
+    });
+  }
+
+  void _stopStatusPolling() {
+    _statusPollingTimer?.cancel();
+    _statusPollingTimer = null;
+  }
+
+
   void _decodeQrImageOnce() {
     final String? qrBase64 = widget.paymentData?['qrImageBase64'];
     if (qrBase64 != null && qrBase64.isNotEmpty) {
@@ -73,6 +154,8 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
 
   @override
   void dispose() {
+    _hideCheckingStatusDialog();
+    _statusPollingTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _linkSub?.cancel();
     _timer?.cancel();
@@ -102,6 +185,8 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
   }
 
   void _showExpiredDialog() {
+    _stopStatusPolling();
+    _hideCheckingStatusDialog();
     if (!mounted) return;
     showDialog(
       context: context,
@@ -149,16 +234,16 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      if (_isPaymentAppOpened) {
+    if (state == AppLifecycleState.resumed && _isPaymentAppOpened) {
+      // if (_isPaymentAppOpened) {
         debugPrint("🔄 App Resumed. Checking Status...");
         _isPaymentAppOpened = false;
-        Future.delayed(const Duration(seconds: 2), () {
-          _checkPaymentStatus();
+        Future.delayed(const Duration(seconds: 5), () {
+          _startStatusPolling();
         });
       }
     }
-  }
+  // }
 
   void _listenDeepLinks() {
     _appLinks = AppLinks();
@@ -188,7 +273,7 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
         setState(() => _isLoading = true);
         AppUtils.showProgressDialog(isCancellable: false);
       } else {
-        _isLoading = true; // Still mark as loading but don't call setState to avoid rebuilds
+        _isLoading = true;
       }
     }
 
@@ -220,16 +305,26 @@ class _ScanToPayScreenState extends State<ScanToPayScreen> with WidgetsBindingOb
       if (res != null && res['status'] == true) {
         final String status = res['data']['status'].toString().toLowerCase();
         if (status == 'success') {
+          _stopStatusPolling();
+          _hideCheckingStatusDialog();
           _timer?.cancel();
           _showSuccessPopup();
         } else if (status == 'failed') {
-          if (!silent) AppUtils.showErrorSnackBar(bodyText: "Payment Failed ❌");
-        } else {
-          if (!silent) _showPendingPopup(status);
+          _stopStatusPolling();
+          if (!silent) {
+            AppUtils.showErrorSnackBar(bodyText: "Payment Failed ❌");
+          }
         }
+        // else {
+        //   if (!silent) _showPendingPopup(status);
+        // }
+        // } else {
+        //   if (!silent) AppUtils.showErrorSnackBar(bodyText: "Could not verify status.");
+        // }
       } else {
-        if (!silent) AppUtils.showErrorSnackBar(bodyText: "Could not verify status.");
-      }
+    debugPrint("⏳ Payment Pending...");
+    _startStatusPolling();
+    }
 
     } catch (e) {
       if (!silent) AppUtils.hideProgressDialog();
